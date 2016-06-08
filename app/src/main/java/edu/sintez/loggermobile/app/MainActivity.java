@@ -95,6 +95,8 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 			};
 		};
 
+		btAdapter = BluetoothAdapter.getDefaultAdapter();
+
 		getDeviceList();
 
 		addDataSet();
