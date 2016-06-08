@@ -38,6 +38,7 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 	// MAC-адрес Bluetooth модуля
 	private static final String BT_DEVICE_ADDRESS = "20:11:02:47:01:60"; //for H-C-2010-06-01
 	private static final int REQUEST_ENABLE_BT = 1;
+	private static final int RECEIVE_BT_DATA = 1;
 
 	private Handler btHandler;
 	private static final int RECEIVE_MESSAGE = 1;        // Статус для Handler
@@ -66,7 +67,7 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 			@Override
 			public void handleMessage(Message msg) {
 //				super.handleMessage(msg);
-				if (msg.what == 1) {
+				if (msg.what == RECEIVE_BT_DATA) {
 					// call this method for add point to chart !
 					addEntry(msg.arg1);
 				}
@@ -76,13 +77,15 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 		btHandler = new Handler() {
 			public void handleMessage(android.os.Message msg) {
 				switch (msg.what) {
-					case RECEIVE_MESSAGE:                                                   // если приняли сообщение в Handler
+					case RECEIVE_MESSAGE:
 						byte[] readBuf = (byte[]) msg.obj;
 						String strIncom = new String(readBuf, 0, msg.arg1);
 						char[] chars = strIncom.toCharArray();
-						for (char aChar : chars) {
-							Log.d(LOG, "> char = "  +(byte)aChar);
-						}
+//						for (char aChar : chars) {
+//							Log.d(LOG, "> char = "  +(byte)aChar);
+//						}
+						Message msg1 = chartHandler.obtainMessage(RECEIVE_BT_DATA, chars[0], 0);
+						chartHandler.sendMessage(msg1);
 						break;
 				}
 			};
