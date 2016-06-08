@@ -62,6 +62,17 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 		lineChart.invalidate();
 		lineChart.setBackgroundColor(Color.GRAY);
 
+		final Handler chartHandler = new Handler() {
+			@Override
+			public void handleMessage(Message msg) {
+//				super.handleMessage(msg);
+				if (msg.what == 1) {
+					// call this method for add point to chart !
+					addEntry(msg.arg1);
+				}
+			}
+		};
+
 		btHandler = new Handler() {
 			public void handleMessage(android.os.Message msg) {
 				switch (msg.what) {
