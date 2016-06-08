@@ -2,6 +2,7 @@ package edu.sintez.loggermobile.app;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -25,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Set;
 import java.util.UUID;
 
 public class MainActivity extends Activity implements OnChartValueSelectedListener {
@@ -90,6 +92,8 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 				}
 			};
 		};
+
+		getDeviceList();
 	}
 
 	@Override
@@ -189,6 +193,17 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 		set.setAxisDependency(YAxis.AxisDependency.LEFT);
 		set.setValueTextSize(10f);
 		return set;
+	}
+
+	private void getDeviceList() {
+		Set<BluetoothDevice> bondedDevices = btAdapter.getBondedDevices();
+		for (BluetoothDevice device : bondedDevices) {
+			Log.d(LOG, "device = " + device);
+			Log.d(LOG, "device.getName() = " + device.getName());
+			Log.d(LOG, "device.getAddress() = " + device.getAddress());
+			Log.d(LOG, "device.getBondState() = " + device.getBondState());
+			Log.d(LOG, "---");
+		}
 	}
 
 	private class ConnectedThread extends Thread {
