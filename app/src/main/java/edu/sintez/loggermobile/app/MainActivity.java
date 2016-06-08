@@ -1,8 +1,12 @@
 package edu.sintez.loggermobile.app;
 
 import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothSocket;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -17,13 +21,29 @@ import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.ColorTemplate;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.UUID;
 
 public class MainActivity extends Activity implements OnChartValueSelectedListener {
 
 	private static final String LOG = MainActivity.class.getName();
 	private LineChart lineChart;
 	private int[] colors = ColorTemplate.VORDIPLOM_COLORS;
+
+	// SPP UUID сервиса
+	private static final UUID BT_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+	// MAC-адрес Bluetooth модуля
+	private static final String BT_DEVICE_ADDRESS = "20:11:02:47:01:60"; //for H-C-2010-06-01
+	private static final int REQUEST_ENABLE_BT = 1;
+
+	private Handler btHandler;
+	private static final int RECEIVE_MESSAGE = 1;        // Статус для Handler
+	private BluetoothAdapter btAdapter = null;
+	private BluetoothSocket btSocket = null;
+	private ConnectedThread connectedThread;
 
 
 	@Override
@@ -41,6 +61,21 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 		lineChart.setData(new LineData());
 		lineChart.invalidate();
 		lineChart.setBackgroundColor(Color.GRAY);
+
+		btHandler = new Handler() {
+			public void handleMessage(android.os.Message msg) {
+				switch (msg.what) {
+					case RECEIVE_MESSAGE:                                                   // если приняли сообщение в Handler
+						byte[] readBuf = (byte[]) msg.obj;
+						String strIncom = new String(readBuf, 0, msg.arg1);
+						char[] chars = strIncom.toCharArray();
+						for (char aChar : chars) {
+							Log.d(LOG, "> char = "  +(byte)aChar);
+						}
+						break;
+				}
+			};
+		};
 	}
 
 	@Override
@@ -140,6 +175,68 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 		set.setAxisDependency(YAxis.AxisDependency.LEFT);
 		set.setValueTextSize(10f);
 		return set;
+	}
+
+	private class ConnectedThread extends Thread {
+		private final BluetoothSocket btSocket;
+		private final InputStream is;
+		private final OutputStream os;
+
+		public ConnectedThread(BluetoothSocket btSocket) {
+			this.btSocket = btSocket;
+			InputStream isTmp = null;
+			OutputStream osTmp = null;
+
+			// Get the input and output streams, using temp objects because
+			// member streams are final
+			try {
+				isTmp = btSocket.getInputStream();
+				osTmp = btSocket.getOutputStream();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+			is = isTmp;
+			os = osTmp;
+		}
+
+		@Override
+		public void run() {
+			byte[] buffer = new byte[256];  // buffer store for the stream
+			int bytes; // bytes returned from read()
+
+			// Keep listening to the InputStream until an exception occurs
+			while (true) {
+				try {
+					// Read from the InputStream
+					bytes = is.read(buffer);        // Получаем кол-во байт и само собщение в байтовый массив "buffer"
+					btHandler.obtainMessage(RECEIVE_MESSAGE, bytes, -1, buffer).sendToTarget();     // Отправляем в очередь сообщений Handler
+				} catch (IOException e) {
+					e.printStackTrace();
+					break;
+				}
+			}
+		}
+
+		/* Call this from the main activity to send data to the remote device */
+		public void write(String message) {
+			Log.d(LOG, "Данные для отправки: " + message + "...");
+			byte[] msgBuffer = message.getBytes();
+			try {
+				os.write(msgBuffer);
+			} catch (IOException e) {
+				Log.d(LOG, "Ошибка отправки данных: " + e.getMessage() + "...");
+			}
+		}
+
+		/* Call this from the main activity to shutdown the connection */
+		public void cancel() {
+			try {
+				btSocket.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 }
