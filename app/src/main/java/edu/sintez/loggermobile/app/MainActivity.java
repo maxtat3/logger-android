@@ -4,8 +4,11 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.highlight.Highlight;
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements OnChartValueSelectedListener {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -33,5 +36,15 @@ public class MainActivity extends Activity {
 		}
 
 		return super.onOptionsItemSelected(item);
+	}
+
+	@Override
+	public void onValueSelected(Entry e, int dataSetIndex, Highlight h) {
+
+	}
+
+	@Override
+	public void onNothingSelected() {
+
 	}
 }
