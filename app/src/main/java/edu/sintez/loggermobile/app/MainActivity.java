@@ -100,6 +100,64 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 	}
 
 	@Override
+	public void onResume() {
+		super.onResume();
+
+		Log.d(LOG, ">>> onResume - попытка соединения...");
+
+		// Set up a pointer to the remote node using it's address.
+		BluetoothDevice device = btAdapter.getRemoteDevice(BT_DEVICE_ADDRESS);
+
+		// Two things are needed to make a connection:
+		//   A MAC address, which we got above.
+		//   A Service ID or UUID.  In this case we are using the UUID for SPP.
+		try {
+			btSocket = device.createRfcommSocketToServiceRecord(BT_UUID);
+		} catch (IOException e) {
+			errorExit("Fatal Error", "In onResume() and socket create failed: " + e.getMessage() + ".");
+		}
+
+		// Discovery is resource intensive.  Make sure it isn't going on
+		// when you attempt to connect and pass your message.
+		btAdapter.cancelDiscovery();
+
+		// Establish the connection.  This will block until it connects.
+		Log.d(LOG, "...Соединяемся...");
+		try {
+			btSocket.connect();
+			Log.d(LOG, "...Соединение установлено и готово к передачи данных...");
+		} catch (IOException e) {
+			try {
+				btSocket.close();
+			} catch (IOException e2) {
+				errorExit("Fatal Error", "In onResume() and unable to close socket during connection failure" + e2.getMessage() + ".");
+			}
+		}
+
+		// Create a data stream so we can talk to server.
+		Log.d(LOG, "...Создание Socket...");
+
+		connectedThread = new ConnectedThread(btSocket);
+		connectedThread.start();
+	}
+
+	@Override
+	public void onPause() {
+		super.onPause();
+		Log.d(LOG, "...In onPause()...");
+		try {
+			btSocket.close();
+		} catch (IOException e2) {
+			errorExit("Fatal Error", "In onPause() and failed to close socket." + e2.getMessage() + ".");
+		}
+	}
+
+	private void errorExit(String title, String message){
+		Toast.makeText(getBaseContext(), title + " - " + message, Toast.LENGTH_LONG).show();
+		finish();
+	}
+
+	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.menu_main, menu);
