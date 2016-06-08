@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
@@ -258,6 +259,22 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 			Log.d(LOG, "device.getAddress() = " + device.getAddress());
 			Log.d(LOG, "device.getBondState() = " + device.getBondState());
 			Log.d(LOG, "---");
+		}
+	}
+
+	private void checkBTState() {
+		// Check for Bluetooth support and then check to make sure it is turned on
+		// Emulator doesn't support Bluetooth and will return null
+		if(btAdapter==null) {
+			errorExit("Fatal Error", "Bluetooth не поддерживается");
+		} else {
+			if (btAdapter.isEnabled()) {
+				Log.d(LOG, "Bluetooth включен...");
+			} else {
+				//Prompt user to turn on Bluetooth
+				Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+				startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+			}
 		}
 	}
 
