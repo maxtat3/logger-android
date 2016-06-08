@@ -94,6 +94,8 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 		};
 
 		getDeviceList();
+
+		addDataSet();
 	}
 
 	@Override
