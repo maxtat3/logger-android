@@ -1,15 +1,24 @@
 package edu.sintez.loggermobile.app;
 
 import android.app.Activity;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.WindowManager;
+import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
+import com.github.mikephil.charting.utils.ColorTemplate;
 
 public class MainActivity extends Activity implements OnChartValueSelectedListener {
+
+	private static final String LOG = MainActivity.class.getName();
+	private LineChart lineChart;
+	private int[] colors = ColorTemplate.VORDIPLOM_COLORS;
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -18,6 +27,14 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
 			WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+		lineChart = (LineChart) findViewById(R.id.line_chart);
+		lineChart.setOnChartValueSelectedListener(this);
+		lineChart.setDrawGridBackground(false);
+		lineChart.setDescription("");
+		lineChart.setData(new LineData());
+		lineChart.invalidate();
+		lineChart.setBackgroundColor(Color.GRAY);
 	}
 
 	@Override
