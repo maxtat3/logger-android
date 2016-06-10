@@ -167,10 +167,13 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 		return true;
 	}
 
+	private long startTime = 0;
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if(item.getItemId() == R.id.mi_action_call_mcu) {
 			connectedThread.write("b");
+			startTime = System.currentTimeMillis();
 			Toast.makeText(this, "Entry added!", Toast.LENGTH_SHORT).show();
 		}
 		return true;
@@ -198,7 +201,8 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 			}
 
 			// add a new x-value first
-			data.addXValue(set.getEntryCount() + "");
+			getRealTime();
+			data.addXValue(getRealTime());
 			data.addEntry(new Entry(val1, set.getEntryCount()), 0);
 
 			lineChart.notifyDataSetChanged();
@@ -208,6 +212,13 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 //          // this automatically refreshes the chart (calls invalidate())
 			lineChart.moveViewTo(data.getXValCount()-7, 50f, YAxis.AxisDependency.LEFT);
 		}
+	}
+
+	private String getRealTime(){
+		long processTime = System.currentTimeMillis() - startTime;
+		int seconds = (int) (processTime / 1000) % 60 ;
+		int minutes = (int) ((processTime / (1000*60)) % 60);
+		return minutes + ":" + seconds;
 	}
 
 	private void addDataSet() {
