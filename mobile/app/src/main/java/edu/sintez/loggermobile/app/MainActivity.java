@@ -131,30 +131,25 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 	@Override
 	public void onResume() {
 		super.onResume();
-
-		Log.d(LOG, ">>> onResume - попытка соединения...");
-
+		Log.d(LOG, "Try connection ...");
 		// Set up a pointer to the remote node using it's address.
 		BluetoothDevice device = btAdapter.getRemoteDevice(BT_DEVICE_ADDRESS);
 
 		// Two things are needed to make a connection:
-		//   A MAC address, which we got above.
-		//   A Service ID or UUID.  In this case we are using the UUID for SPP.
+		//      A MAC address, which we got above.
+		//      A Service ID or UUID. In this case we are using the UUID for SPP.
 		try {
 			btSocket = device.createRfcommSocketToServiceRecord(BT_UUID);
 		} catch (IOException e) {
 			errorExit("Fatal Error", "In onResume() and socket create failed: " + e.getMessage() + ".");
 		}
-
-		// Discovery is resource intensive.  Make sure it isn't going on
-		// when you attempt to connect and pass your message.
 		btAdapter.cancelDiscovery();
 
-		// Establish the connection.  This will block until it connects.
-		Log.d(LOG, "...Соединяемся...");
+		// Establish the connection. This will block until it connects.
+		Log.d(LOG, "Connecting ...");
 		try {
 			btSocket.connect();
-			Log.d(LOG, "...Соединение установлено и готово к передачи данных...");
+			Log.d(LOG, "Connecting and ready do sending data !");
 		} catch (IOException e) {
 			try {
 				btSocket.close();
@@ -163,17 +158,16 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 			}
 		}
 
-		// Create a data stream so we can talk to server.
-		Log.d(LOG, "...Создание Socket...");
-
+		Log.d(LOG, "Create data stream ...");
 		connectedThread = new ConnectedThread(btSocket);
 		connectedThread.start();
+		Log.d(LOG, "Data stream created !");
 	}
 
 	@Override
 	public void onPause() {
 		super.onPause();
-		Log.d(LOG, "...In onPause()...");
+		Log.d(LOG, "Socket close ...");
 		try {
 			btSocket.close();
 		} catch (IOException e2) {
