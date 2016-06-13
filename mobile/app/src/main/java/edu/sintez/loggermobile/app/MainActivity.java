@@ -315,16 +315,18 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 		}
 	}
 
+	/**
+	 * Check Bluetooth support and then check to make sure it is turned on.
+	 * Emulator doesn't support Bluetooth and will return null !
+	 */
 	private void checkBTState() {
-		// Check for Bluetooth support and then check to make sure it is turned on
-		// Emulator doesn't support Bluetooth and will return null
-		if(btAdapter==null) {
-			errorExit("Fatal Error", "Bluetooth не поддерживается");
+		if(btAdapter == null) {
+			errorExit("Fatal Error", "Bluetooth not supported !");
 		} else {
 			if (btAdapter.isEnabled()) {
-				Log.d(LOG, "Bluetooth включен...");
+				Log.d(LOG, "Bluetooth turn on .");
 			} else {
-				//Prompt user to turn on Bluetooth
+				// Prompt user to turn on Bluetooth
 				Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
 				startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
 			}
