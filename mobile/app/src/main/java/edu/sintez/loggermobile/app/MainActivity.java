@@ -169,9 +169,26 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 
 	private long startTime = 0;
 
+	/**
+	 * Flag indicates start/stop measure process.
+	 * <tt>true</tt> process started, otherwise <tt>false</tt> stopped.
+	 */
+	private boolean isStartMeasure = false;
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if(item.getItemId() == R.id.mi_action_call_mcu) {
+			// if isStartMeasure flag == false -> reset previous data and start msr
+			// if true -> stop msr
+			if (!isStartMeasure) {
+				lineChart.clear();
+				lineChart.setData(new LineData());
+				addDataSet();
+				lineChart.notifyDataSetChanged();
+				lineChart.invalidate();
+			}
+			isStartMeasure = !isStartMeasure;
+
 			connectedThread.write("b");
 			startTime = System.currentTimeMillis();
 			Toast.makeText(this, "Entry added!", Toast.LENGTH_SHORT).show();
