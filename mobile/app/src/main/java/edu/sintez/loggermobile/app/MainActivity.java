@@ -76,6 +76,17 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 	private BluetoothSocket btSocket = null;
 	private ConnectedThread connectedThread;
 
+	/**
+	 * When started measure process in this variable set beginning time this process.
+	 */
+	private long startTime = 0;
+
+	/**
+	 * Flag indicates start/stop measure process.
+	 * <tt>true</tt> process started, otherwise <tt>false</tt> stopped.
+	 */
+	private boolean isStartMeasure = false;
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -186,14 +197,6 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 		getMenuInflater().inflate(R.menu.menu_main, menu);
 		return true;
 	}
-
-	private long startTime = 0;
-
-	/**
-	 * Flag indicates start/stop measure process.
-	 * <tt>true</tt> process started, otherwise <tt>false</tt> stopped.
-	 */
-	private boolean isStartMeasure = false;
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
