@@ -34,18 +34,44 @@ import java.util.UUID;
 public class MainActivity extends Activity implements OnChartValueSelectedListener {
 
 	private static final String LOG = MainActivity.class.getName();
-	private LineChart lineChart;
-	private int[] colors = ColorTemplate.VORDIPLOM_COLORS;
 
-	// SPP UUID сервиса
+	/**
+	 * Service SPP UUID
+	 */
 	private static final UUID BT_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
-	// MAC-адрес Bluetooth модуля
+
+	/**
+	 * MAC address bluetooth (BT) module. This BT module placed in mcu device.
+	 */
 	private static final String BT_DEVICE_ADDRESS = "20:11:02:47:01:60"; //for H-C-2010-06-01
+
+	/**
+	 * Request to enable BT module in android device if he is turn off.
+	 */
 	private static final int REQUEST_ENABLE_BT = 1;
+
+	/**
+	 * Receive BT data from mcu device.
+	 */
 	private static final int RECEIVE_BT_DATA = 1;
 
+	/**
+	 * Receive massage from BT in {@link ConnectedThread}.
+	 * This massage handled in BT handler {@link #btHandler}.
+	 */
+	private static final int RECEIVE_MSG = 1;
+
+	/**
+	 * Data set line colours.
+	 */
+	private int[] dataSetColors = ColorTemplate.VORDIPLOM_COLORS;
+
+	/**
+	 * Dynamic line chart object.
+	 */
+	private LineChart lineChart;
+
 	private Handler btHandler;
-	private static final int RECEIVE_MESSAGE = 1;        // Статус для Handler
 	private BluetoothAdapter btAdapter = null;
 	private BluetoothSocket btSocket = null;
 	private ConnectedThread connectedThread;
@@ -81,7 +107,7 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 		btHandler = new Handler() {
 			public void handleMessage(android.os.Message msg) {
 				switch (msg.what) {
-					case RECEIVE_MESSAGE:
+					case RECEIVE_MSG:
 						byte[] readBuf = (byte[]) msg.obj;
 						String strIncom = new String(readBuf, 0, msg.arg1);
 						char[] chars = strIncom.toCharArray();
@@ -255,7 +281,7 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 			set.setLineWidth(2.5f);
 			set.setCircleRadius(0);
 
-			int color = colors[count % colors.length];
+			int color = dataSetColors[count % dataSetColors.length];
 
 			set.setColor(color);
 			set.setCircleColor(color);
@@ -341,7 +367,7 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 				try {
 					// Read from the InputStream
 					bytes = is.read(buffer);        // Получаем кол-во байт и само собщение в байтовый массив "buffer"
-					btHandler.obtainMessage(RECEIVE_MESSAGE, bytes, -1, buffer).sendToTarget();     // Отправляем в очередь сообщений Handler
+					btHandler.obtainMessage(RECEIVE_MSG, bytes, -1, buffer).sendToTarget();     // Отправляем в очередь сообщений Handler
 				} catch (IOException e) {
 					e.printStackTrace();
 					break;
