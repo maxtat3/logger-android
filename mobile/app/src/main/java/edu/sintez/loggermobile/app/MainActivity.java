@@ -34,6 +34,7 @@ import java.util.UUID;
 public class MainActivity extends Activity implements OnChartValueSelectedListener {
 
 	private static final String LOG = MainActivity.class.getName();
+	private boolean isLog = true;
 
 	/**
 	 * Service SPP UUID
@@ -124,6 +125,7 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 						char[] chars = strIncom.toCharArray();
 //						for (char aChar : chars) {
 //							Log.d(LOG, "> char = "  +(byte)aChar);
+//							log( "> char = "  +(byte)aChar);
 //						}
 						Message msg1 = chartHandler.obtainMessage(RECEIVE_BT_DATA, chars[0], 0);
 						chartHandler.sendMessage(msg1);
@@ -142,7 +144,7 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 	@Override
 	public void onResume() {
 		super.onResume();
-		Log.d(LOG, "Try connection ...");
+		log("Try connection ...");
 		// Set up a pointer to the remote node using it's address.
 		BluetoothDevice device = btAdapter.getRemoteDevice(BT_DEVICE_ADDRESS);
 
@@ -157,10 +159,10 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 		btAdapter.cancelDiscovery();
 
 		// Establish the connection. This will block until it connects.
-		Log.d(LOG, "Connecting ...");
+		log("Connecting ...");
 		try {
 			btSocket.connect();
-			Log.d(LOG, "Connecting and ready do sending data !");
+			log("Connecting and ready do sending data !");
 		} catch (IOException e) {
 			try {
 				btSocket.close();
@@ -169,16 +171,16 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 			}
 		}
 
-		Log.d(LOG, "Create data stream ...");
+		log("Create data stream ...");
 		connectedThread = new ConnectedThread(btSocket);
 		connectedThread.start();
-		Log.d(LOG, "Data stream created !");
+		log("Data stream created !");
 	}
 
 	@Override
 	public void onPause() {
 		super.onPause();
-		Log.d(LOG, "Socket close ...");
+		log("Socket close ...");
 		try {
 			btSocket.close();
 		} catch (IOException e2) {
@@ -265,14 +267,14 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 		LineData data = lineChart.getData();
 
 		if(data != null) {
-			Log.d(LOG, "data.getDataSetCount() = " + data.getDataSetCount());
+			log("data.getDataSetCount() = " + data.getDataSetCount());
 			int count = (data.getDataSetCount() + 1);
-			Log.d(LOG, "data.getDataSetCount() = " + data.getDataSetCount());
+			log("data.getDataSetCount() = " + data.getDataSetCount());
 
 			// create 10 y-vals
 			ArrayList<Entry> yVals = new ArrayList<Entry>();
 
-			Log.d(LOG, "data.getXValCount() = " + (data.getXValCount()));
+			log("data.getXValCount() = " + (data.getXValCount()));
 
 			LineDataSet set = new LineDataSet(yVals, "DataSet " + count);
 			set.setLineWidth(2.5f);
@@ -307,11 +309,11 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 	private void getDeviceList() {
 		Set<BluetoothDevice> bondedDevices = btAdapter.getBondedDevices();
 		for (BluetoothDevice device : bondedDevices) {
-			Log.d(LOG, "device = " + device);
-			Log.d(LOG, "device.getName() = " + device.getName());
-			Log.d(LOG, "device.getAddress() = " + device.getAddress());
-			Log.d(LOG, "device.getBondState() = " + device.getBondState());
-			Log.d(LOG, "---");
+			log("device = " + device);
+			log("device.getName() = " + device.getName());
+			log("device.getAddress() = " + device.getAddress());
+			log("device.getBondState() = " + device.getBondState());
+			log("---");
 		}
 	}
 
@@ -324,7 +326,7 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 			errorExit("Fatal Error", "Bluetooth not supported !");
 		} else {
 			if (btAdapter.isEnabled()) {
-				Log.d(LOG, "Bluetooth turn on .");
+				log("Bluetooth turn on .");
 			} else {
 				// Prompt user to turn on Bluetooth
 				Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
@@ -335,6 +337,7 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 
 	private class ConnectedThread extends Thread {
 		private final String LOG = ConnectedThread.class.getName();
+		private boolean isLogThread = false;
 		private final BluetoothSocket btSocket;
 		private final InputStream is;
 		private final OutputStream os;
@@ -375,15 +378,16 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 
 		/**
 		 * Write string data to output stream and translate from BT to mcu device.
+		 *
 		 * @param msg massage sending to mcu device
 		 */
 		public void write(String msg) {
-			Log.d(LOG, "Data for sending to mcu device : " + msg + "...");
+			if (isLogThread) Log.d(LOG, "Data for sending to mcu device : " + msg + "...");
 			byte[] msgBuffer = msg.getBytes();
 			try {
 				os.write(msgBuffer);
 			} catch (IOException e) {
-				Log.d(LOG, "Error data sending : " + e.getMessage() + " !");
+				if (isLogThread) Log.d(LOG, "Error data sending : " + e.getMessage() + " !");
 			}
 		}
 
@@ -397,6 +401,15 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 				e.printStackTrace();
 			}
 		}
+	}
+
+	/**
+	 * Output logging information in console if {@link #isLog} flag enabled.
+	 *
+	 * @param msg logging massage
+	 */
+	private void log(String msg) {
+		if (isLog) Log.d(LOG, msg);
 	}
 
 }
