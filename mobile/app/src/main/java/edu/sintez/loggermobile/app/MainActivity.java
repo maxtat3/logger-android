@@ -334,6 +334,7 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 	}
 
 	private class ConnectedThread extends Thread {
+		private final String LOG = ConnectedThread.class.getName();
 		private final BluetoothSocket btSocket;
 		private final InputStream is;
 		private final OutputStream os;
@@ -343,8 +344,7 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 			InputStream isTmp = null;
 			OutputStream osTmp = null;
 
-			// Get the input and output streams, using temp objects because
-			// member streams are final
+			// Get the input and output streams, using temp objects because member streams are final.
 			try {
 				isTmp = btSocket.getInputStream();
 				osTmp = btSocket.getOutputStream();
@@ -359,14 +359,13 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 		@Override
 		public void run() {
 			byte[] buffer = new byte[256];  // buffer store for the stream
-			int bytes; // bytes returned from read()
+			int bytes;
 
 			// Keep listening to the InputStream until an exception occurs
 			while (true) {
 				try {
-					// Read from the InputStream
-					bytes = is.read(buffer);        // Получаем кол-во байт и само собщение в байтовый массив "buffer"
-					btHandler.obtainMessage(RECEIVE_MSG, bytes, -1, buffer).sendToTarget();     // Отправляем в очередь сообщений Handler
+					bytes = is.read(buffer);
+					btHandler.obtainMessage(RECEIVE_MSG, bytes, -1, buffer).sendToTarget();
 				} catch (IOException e) {
 					e.printStackTrace();
 					break;
@@ -374,18 +373,23 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 			}
 		}
 
-		/* Call this from the main activity to send data to the remote device */
-		public void write(String message) {
-			Log.d(LOG, "Данные для отправки: " + message + "...");
-			byte[] msgBuffer = message.getBytes();
+		/**
+		 * Write string data to output stream and translate from BT to mcu device.
+		 * @param msg massage sending to mcu device
+		 */
+		public void write(String msg) {
+			Log.d(LOG, "Data for sending to mcu device : " + msg + "...");
+			byte[] msgBuffer = msg.getBytes();
 			try {
 				os.write(msgBuffer);
 			} catch (IOException e) {
-				Log.d(LOG, "Ошибка отправки данных: " + e.getMessage() + "...");
+				Log.d(LOG, "Error data sending : " + e.getMessage() + " !");
 			}
 		}
 
-		/* Call this from the main activity to shutdown the connection */
+		/**
+		 * Call this from the main activity to shutdown the connection
+		 */
 		public void cancel() {
 			try {
 				btSocket.close();
