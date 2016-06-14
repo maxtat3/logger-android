@@ -98,12 +98,8 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 			WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
 		lineChart = (LineChart) findViewById(R.id.line_chart);
-		lineChart.setOnChartValueSelectedListener(this);
-		lineChart.setDrawGridBackground(false);
-		lineChart.setDescription("");
-		lineChart.setData(new LineData());
-		lineChart.invalidate();
-		lineChart.setBackgroundColor(Color.GRAY);
+
+		chartInit();
 
 		final Handler chartHandler = new Handler() {
 			@Override
@@ -186,6 +182,18 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 		} catch (IOException e2) {
 			errorExit("Fatal Error", "In onPause() and failed to close socket." + e2.getMessage() + ".");
 		}
+	}
+
+	/**
+	 * Initial chart configuration
+	 */
+	private void chartInit() {
+		lineChart.setOnChartValueSelectedListener(this);
+		lineChart.setDrawGridBackground(false);
+		lineChart.setDescription("");
+		lineChart.setData(new LineData());
+		lineChart.invalidate();
+		lineChart.setBackgroundColor(Color.GRAY);
 	}
 
 	private void errorExit(String title, String message){
