@@ -194,6 +194,8 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 		lineChart.setData(new LineData());
 		lineChart.invalidate();
 		lineChart.setBackgroundColor(Color.GRAY);
+		lineChart.getAxisLeft().setAxisMaxValue(255f);
+		lineChart.getAxisLeft().setAxisMinValue(0);
 	}
 
 	private void errorExit(String title, String message){
