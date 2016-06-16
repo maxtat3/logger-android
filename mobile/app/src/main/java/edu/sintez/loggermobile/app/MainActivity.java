@@ -256,9 +256,7 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 
 			if (connectedThread != null) connectedThread.write("b");
 			startTime = System.currentTimeMillis();
-			Toast.makeText(this, "Entry added!", Toast.LENGTH_SHORT).show();
 		} else if (item.getItemId() == R.id.mi_action_refresh) {
-			log("refresh");
 			setupBTConnection();
 		}
 		return true;
