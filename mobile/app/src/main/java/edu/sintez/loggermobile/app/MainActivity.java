@@ -72,7 +72,7 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 	 */
 	private LineChart lineChart;
 
-	private Handler btHandler;
+//	private Handler btHandler;
 	private BluetoothAdapter btAdapter = null;
 	private BluetoothSocket btSocket = null;
 	private ConnectedThread connectedThread;
@@ -88,6 +88,35 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 	 */
 	private boolean isStartMeasure = false;
 
+	private final Handler chartHandler = new Handler() {
+		@Override
+		public void handleMessage(Message msg) {
+//				super.handleMessage(msg);
+			if (msg.what == RECEIVE_BT_DATA) {
+				// call this method for add point to chart !
+				addEntry(msg.arg1);
+			}
+		}
+	};
+
+	private Handler btHandler = new Handler() {
+		public void handleMessage(android.os.Message msg) {
+			switch (msg.what) {
+				case RECEIVE_MSG:
+					byte[] readBuf = (byte[]) msg.obj;
+					String strIncom = new String(readBuf, 0, msg.arg1);
+					char[] chars = strIncom.toCharArray();
+//						for (char aChar : chars) {
+//							Log.d(LOG, "> char = "  +(byte)aChar);
+//							log( "> char = "  +(byte)aChar);
+//						}
+					Message msg1 = chartHandler.obtainMessage(RECEIVE_BT_DATA, chars[0], 0);
+					chartHandler.sendMessage(msg1);
+					break;
+			}
+		};
+	};
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -98,48 +127,74 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 			WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
 		lineChart = (LineChart) findViewById(R.id.line_chart);
-
 		chartInit();
-
-		final Handler chartHandler = new Handler() {
-			@Override
-			public void handleMessage(Message msg) {
-//				super.handleMessage(msg);
-				if (msg.what == RECEIVE_BT_DATA) {
-					// call this method for add point to chart !
-					addEntry(msg.arg1);
-				}
-			}
-		};
-
-		btHandler = new Handler() {
-			public void handleMessage(android.os.Message msg) {
-				switch (msg.what) {
-					case RECEIVE_MSG:
-						byte[] readBuf = (byte[]) msg.obj;
-						String strIncom = new String(readBuf, 0, msg.arg1);
-						char[] chars = strIncom.toCharArray();
-//						for (char aChar : chars) {
-//							Log.d(LOG, "> char = "  +(byte)aChar);
-//							log( "> char = "  +(byte)aChar);
-//						}
-						Message msg1 = chartHandler.obtainMessage(RECEIVE_BT_DATA, chars[0], 0);
-						chartHandler.sendMessage(msg1);
-						break;
-				}
-			};
-		};
+		addDataSet();
 
 		btAdapter = BluetoothAdapter.getDefaultAdapter();
-
-		getDeviceList();
-
-		addDataSet();
 	}
 
 	@Override
 	public void onResume() {
+		log("@onresume");
 		super.onResume();
+		if (checkBTState()) {
+			getDeviceList();
+			setupBTConnection();
+		}
+	}
+
+	/**
+	 * Check Bluetooth support and then check to make sure it is turned on.
+	 * Emulator doesn't support Bluetooth and will return null !
+	 */
+	private boolean checkBTState() {
+		if(btAdapter == null) {
+			showMsgErrorAndExit("Fatal Error", "Bluetooth not supported !");
+			return false;
+		} else {
+			if (btAdapter.isEnabled()) {
+				log("Bluetooth turn on .");
+				return true;
+			} else {
+				// Prompt user to turn on Bluetooth
+				Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+				startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+				return false;
+			}
+		}
+	}
+
+	@Override
+	public void onPause() {
+		super.onPause();
+		log(">>> @onPause");
+		log("Socket close ...");
+		try {
+			if (btSocket != null) {
+				btSocket.close();
+				log(">>> bt socket close.");
+			}
+		} catch (IOException e2) {
+			showMsgErrorAndExit("Fatal Error", "In onPause() and failed to close socket." + e2.getMessage() + ".");
+		}
+	}
+
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		switch (requestCode) {
+			case REQUEST_ENABLE_BT:
+				// When the request to enable Bluetooth returns
+				if (resultCode == Activity.RESULT_OK) {
+//					getDeviceList();
+//					setupBTConnection();
+				} else {
+					// User did not enable Bluetooth or an error occurred
+					log("BT not enabled");
+					showMsgErrorAndExit("", "Bluetooth is not enabled. Exit Logger.");
+				}
+		}
+	}
+
+	private void setupBTConnection() {
 		log("Try connection ...");
 		// Set up a pointer to the remote node using it's address.
 		BluetoothDevice device = btAdapter.getRemoteDevice(BT_DEVICE_ADDRESS);
@@ -156,11 +211,13 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 
 		// Establish the connection. This will block until it connects.
 		log("Connecting ...");
+//		if (btSocket != null) log("bts NOT null"); else log("bts is null");
 		try {
 			btSocket.connect();
 			log("Connecting and ready do sending data !");
 		} catch (IOException e) {
 			try {
+				log("bts close");
 				btSocket.close();
 			} catch (IOException e2) {
 				showMsgErrorAndExit("Fatal Error", "In onResume() and unable to close socket during connection failure" + e2.getMessage() + ".");
@@ -171,17 +228,6 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 		connectedThread = new ConnectedThread(btSocket);
 		connectedThread.start();
 		log("Data stream created !");
-	}
-
-	@Override
-	public void onPause() {
-		super.onPause();
-		log("Socket close ...");
-		try {
-			btSocket.close();
-		} catch (IOException e2) {
-			showMsgErrorAndExit("Fatal Error", "In onPause() and failed to close socket." + e2.getMessage() + ".");
-		}
 	}
 
 	/**
@@ -283,14 +329,14 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 		LineData data = lineChart.getData();
 
 		if(data != null) {
-			log("data.getDataSetCount() = " + data.getDataSetCount());
+//			log("data.getDataSetCount() = " + data.getDataSetCount());
 			int count = (data.getDataSetCount() + 1);
-			log("data.getDataSetCount() = " + data.getDataSetCount());
+//			log("data.getDataSetCount() = " + data.getDataSetCount());
 
 			// create 10 y-vals
 			ArrayList<Entry> yVals = new ArrayList<Entry>();
 
-			log("data.getXValCount() = " + (data.getXValCount()));
+//			log("data.getXValCount() = " + (data.getXValCount()));
 
 			LineDataSet set = new LineDataSet(yVals, "DataSet " + count);
 			set.setLineWidth(2.5f);
@@ -330,24 +376,6 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 			log("device.getAddress() = " + device.getAddress());
 			log("device.getBondState() = " + device.getBondState());
 			log("---");
-		}
-	}
-
-	/**
-	 * Check Bluetooth support and then check to make sure it is turned on.
-	 * Emulator doesn't support Bluetooth and will return null !
-	 */
-	private void checkBTState() {
-		if(btAdapter == null) {
-			showMsgErrorAndExit("Fatal Error", "Bluetooth not supported !");
-		} else {
-			if (btAdapter.isEnabled()) {
-				log("Bluetooth turn on .");
-			} else {
-				// Prompt user to turn on Bluetooth
-				Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-				startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-			}
 		}
 	}
 
