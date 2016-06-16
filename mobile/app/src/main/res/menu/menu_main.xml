@@ -6,7 +6,7 @@
 		  android:title="Start measure process"
 		  android:orderInCategory="100"
 		  android:showAsAction="ifRoom|withText"
-		  android:icon="@mipmap/ic_start_process"
+		  android:icon="@mipmap/ic_start_process_turn_off"
 		/>
 
 	<item android:id="@+id/mi_action_refresh"

@@ -251,6 +251,9 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 				addDataSet();
 				lineChart.notifyDataSetChanged();
 				lineChart.invalidate();
+				item.setIcon(getResources().getDrawable(R.mipmap.ic_start_process_turn_on));
+			} else {
+				item.setIcon(getResources().getDrawable(R.mipmap.ic_start_process_turn_off));
 			}
 			isStartMeasure = !isStartMeasure;
 
