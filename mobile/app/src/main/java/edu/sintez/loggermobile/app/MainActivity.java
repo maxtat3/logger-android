@@ -45,7 +45,7 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 	/**
 	 * MAC address bluetooth (BT) module. This BT module placed in mcu device.
 	 */
-	private static final String BT_DEVICE_ADDRESS = "20:11:02:47:01:60"; //for H-C-2010-06-01
+	public static final String BT_DEVICE_ADDRESS = "20:11:02:47:01:60"; //for H-C-2010-06-01
 
 	/**
 	 * Request to enable BT module in android device if he is turn off.
@@ -259,8 +259,12 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 
 			if (connectedThread != null) connectedThread.write("b");
 			startTime = System.currentTimeMillis();
+
 		} else if (item.getItemId() == R.id.mi_action_refresh) {
 			setupBTConnection();
+
+		} else if (item.getItemId() == R.id.mi_action_settings) {
+			startActivity(new Intent(this, SettingsActivity.class));
 		}
 		return true;
 	}
