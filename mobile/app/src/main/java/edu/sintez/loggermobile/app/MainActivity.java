@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
@@ -175,7 +176,7 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 	private void setupBTConnection() {
 		log("Try connection ...");
 		// Set up a pointer to the remote node using it's address.
-		BluetoothDevice device = btAdapter.getRemoteDevice(BT_DEVICE_ADDRESS);
+		BluetoothDevice device = btAdapter.getRemoteDevice(getAddressFromInternal());
 
 		// Two things are needed to make a connection:
 		//      A MAC address, which we got above.
@@ -206,6 +207,16 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 				showMsgErrorAndExit("Fatal Error", "In onResume() and unable to close socket during connection failure" + e2.getMessage() + ".");
 			}
 		}
+	}
+
+	/**
+	 * Obtained MCU BT device address value from internal application storage (ShredPreferences).
+	 *
+	 * @return bluetooth (BT) address in MCU device.
+	 */
+	private String getAddressFromInternal() {
+		SharedPreferences prefs = getSharedPreferences(Setting.SETTINGS_XML_FILE_NAME, MODE_PRIVATE);
+		return prefs.getString(Setting.SETTINGS_BT_MCU_DEVICE_ADDRESS_KEY, Setting.SETTINGS_BT_MCU_DEVICE_DEFAULT_ADDRESS);
 	}
 
 	/**

@@ -10,6 +10,14 @@ public class Setting {
 	 */
 	public static final String SETTINGS_XML_FILE_NAME = "settings.xml";
 
+	/**
+	 * Default address value. Using when application first installed to android device and
+	 * settings internal storage is empty.
+	 * In method {@link android.bluetooth.BluetoothAdapter#getRemoteDevice} must be passed
+	 * any formatted address otherwise throw {@link IllegalArgumentException}.
+	 */
+	public static final String SETTINGS_BT_MCU_DEVICE_DEFAULT_ADDRESS = "00:00:00:00:00:00";
+
 	public static final String SETTINGS_BT_MCU_DEVICE_ADDRESS_KEY = "BT_MCU_DEVICE_ADDRESS";
 
 	private String address;
