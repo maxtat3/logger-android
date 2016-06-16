@@ -150,7 +150,7 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 		try {
 			btSocket = device.createRfcommSocketToServiceRecord(BT_UUID);
 		} catch (IOException e) {
-			errorExit("Fatal Error", "In onResume() and socket create failed: " + e.getMessage() + ".");
+			showMsgErrorAndExit("Fatal Error", "In onResume() and socket create failed: " + e.getMessage() + ".");
 		}
 		btAdapter.cancelDiscovery();
 
@@ -163,7 +163,7 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 			try {
 				btSocket.close();
 			} catch (IOException e2) {
-				errorExit("Fatal Error", "In onResume() and unable to close socket during connection failure" + e2.getMessage() + ".");
+				showMsgErrorAndExit("Fatal Error", "In onResume() and unable to close socket during connection failure" + e2.getMessage() + ".");
 			}
 		}
 
@@ -180,7 +180,7 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 		try {
 			btSocket.close();
 		} catch (IOException e2) {
-			errorExit("Fatal Error", "In onPause() and failed to close socket." + e2.getMessage() + ".");
+			showMsgErrorAndExit("Fatal Error", "In onPause() and failed to close socket." + e2.getMessage() + ".");
 		}
 	}
 
@@ -198,7 +198,13 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 		lineChart.getAxisLeft().setAxisMinValue(0);
 	}
 
-	private void errorExit(String title, String message){
+	/**
+	 * If there is problem in application show this Toast (massage) and exit from application.
+	 *
+	 * @param title of this massage
+	 * @param message showing in Toast
+	 */
+	private void showMsgErrorAndExit(String title, String message){
 		Toast.makeText(getBaseContext(), title + " - " + message, Toast.LENGTH_LONG).show();
 		finish();
 	}
@@ -333,7 +339,7 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 	 */
 	private void checkBTState() {
 		if(btAdapter == null) {
-			errorExit("Fatal Error", "Bluetooth not supported !");
+			showMsgErrorAndExit("Fatal Error", "Bluetooth not supported !");
 		} else {
 			if (btAdapter.isEnabled()) {
 				log("Bluetooth turn on .");
