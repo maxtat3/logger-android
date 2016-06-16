@@ -216,7 +216,7 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 	 */
 	private String getAddressFromInternal() {
 		SharedPreferences prefs = getSharedPreferences(Setting.SETTINGS_XML_FILE_NAME, MODE_PRIVATE);
-		return prefs.getString(Setting.SETTINGS_BT_MCU_DEVICE_ADDRESS_KEY, Setting.SETTINGS_BT_MCU_DEVICE_DEFAULT_ADDRESS);
+		return prefs.getString(Setting.BT_MCU_DEVICE_ADDRESS_KEY, Setting.BT_MCU_DEVICE_DEFAULT_ADDRESS);
 	}
 
 	/**

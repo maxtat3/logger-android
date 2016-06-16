@@ -50,12 +50,12 @@ public class SettingsActivity extends Activity {
 
 	private Setting getSettings() {
 		SharedPreferences prefs = getSharedPreferences(Setting.SETTINGS_XML_FILE_NAME, MODE_PRIVATE);
-		String address = prefs.getString(Setting.SETTINGS_BT_MCU_DEVICE_ADDRESS_KEY, Setting.SETTINGS_BT_MCU_DEVICE_DEFAULT_ADDRESS);
+		String address = prefs.getString(Setting.BT_MCU_DEVICE_ADDRESS_KEY, Setting.BT_MCU_DEVICE_DEFAULT_ADDRESS);
 		return new Setting(address);
 	}
 
 	private void saveSettings(Setting setting) {
 		SharedPreferences prefs = getSharedPreferences(Setting.SETTINGS_XML_FILE_NAME, MODE_PRIVATE);
-		prefs.edit().putString(Setting.SETTINGS_BT_MCU_DEVICE_ADDRESS_KEY, setting.getAddress()).apply();
+		prefs.edit().putString(Setting.BT_MCU_DEVICE_ADDRESS_KEY, setting.getAddress()).apply();
 	}
 }
