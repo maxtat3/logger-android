@@ -215,6 +215,11 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 		try {
 			btSocket.connect();
 			log("Connecting and ready do sending data !");
+
+			log("Create data stream ...");
+			connectedThread = new ConnectedThread(btSocket);
+			connectedThread.start();
+			log("Data stream created !");
 		} catch (IOException e) {
 			try {
 				log("bts close");
@@ -223,11 +228,6 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 				showMsgErrorAndExit("Fatal Error", "In onResume() and unable to close socket during connection failure" + e2.getMessage() + ".");
 			}
 		}
-
-		log("Create data stream ...");
-		connectedThread = new ConnectedThread(btSocket);
-		connectedThread.start();
-		log("Data stream created !");
 	}
 
 	/**
@@ -276,9 +276,12 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 			}
 			isStartMeasure = !isStartMeasure;
 
-			connectedThread.write("b");
+			if (connectedThread != null) connectedThread.write("b");
 			startTime = System.currentTimeMillis();
 			Toast.makeText(this, "Entry added!", Toast.LENGTH_SHORT).show();
+		} else if (item.getItemId() == R.id.mi_action_refresh) {
+			log("refresh");
+			setupBTConnection();
 		}
 		return true;
 	}

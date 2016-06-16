@@ -8,4 +8,11 @@
 		  android:showAsAction="ifRoom|withText"
 		  android:icon="@mipmap/ic_start_process"
 		/>
+
+	<item android:id="@+id/mi_action_refresh"
+		  android:title="Refresh"
+		  android:orderInCategory="100"
+		  android:showAsAction="ifRoom|withText"
+		  android:icon="@android:drawable/ic_dialog_map"
+		/>
 </menu>
