@@ -27,6 +27,7 @@ import com.github.mikephil.charting.utils.ColorTemplate;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.UUID;
@@ -72,7 +73,6 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 	 */
 	private LineChart lineChart;
 
-//	private Handler btHandler;
 	private BluetoothAdapter btAdapter = null;
 	private BluetoothSocket btSocket = null;
 	private ConnectedThread connectedThread;
@@ -88,34 +88,8 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 	 */
 	private boolean isStartMeasure = false;
 
-	private final Handler chartHandler = new Handler() {
-		@Override
-		public void handleMessage(Message msg) {
-//				super.handleMessage(msg);
-			if (msg.what == RECEIVE_BT_DATA) {
-				// call this method for add point to chart !
-				addEntry(msg.arg1);
-			}
-		}
-	};
-
-	private Handler btHandler = new Handler() {
-		public void handleMessage(android.os.Message msg) {
-			switch (msg.what) {
-				case RECEIVE_MSG:
-					byte[] readBuf = (byte[]) msg.obj;
-					String strIncom = new String(readBuf, 0, msg.arg1);
-					char[] chars = strIncom.toCharArray();
-//						for (char aChar : chars) {
-//							Log.d(LOG, "> char = "  +(byte)aChar);
-//							log( "> char = "  +(byte)aChar);
-//						}
-					Message msg1 = chartHandler.obtainMessage(RECEIVE_BT_DATA, chars[0], 0);
-					chartHandler.sendMessage(msg1);
-					break;
-			}
-		};
-	};
+	private Handler chartHandler;
+	private Handler btHandler;
 
 
 	@Override
@@ -127,6 +101,10 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 			WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
 		lineChart = (LineChart) findViewById(R.id.line_chart);
+
+		chartHandler = new ChartHandler(this);
+		btHandler = new BTHandler(this);
+
 		chartInit();
 		addDataSet();
 
@@ -379,6 +357,47 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 			log("device.getAddress() = " + device.getAddress());
 			log("device.getBondState() = " + device.getBondState());
 			log("---");
+		}
+	}
+
+	private static class ChartHandler extends Handler {
+		WeakReference<MainActivity> wActivity;
+
+		public ChartHandler(MainActivity activity) {
+			wActivity = new WeakReference<MainActivity>(activity);
+		}
+
+		@Override
+		public void handleMessage(Message msg) {
+//				super.handleMessage(msg);
+			if (msg.what == RECEIVE_BT_DATA) {
+				// call this method for add point to chart !
+				wActivity.get().addEntry(msg.arg1);
+			}
+		}
+	}
+
+	private static class BTHandler extends Handler{
+		WeakReference<MainActivity> wActivity;
+
+		public BTHandler(MainActivity activity) {
+			wActivity = new WeakReference<MainActivity>(activity);
+		}
+
+		public void handleMessage(android.os.Message msg) {
+			switch (msg.what) {
+				case RECEIVE_MSG:
+					byte[] readBuf = (byte[]) msg.obj;
+					String strIncom = new String(readBuf, 0, msg.arg1);
+					char[] chars = strIncom.toCharArray();
+//						for (char aChar : chars) {
+//							Log.d(LOG, "> char = "  +(byte)aChar);
+//							log( "> char = "  +(byte)aChar);
+//						}
+					Message msg1 = wActivity.get().chartHandler.obtainMessage(RECEIVE_BT_DATA, chars[0], 0);
+					wActivity.get().chartHandler.sendMessage(msg1);
+					break;
+			}
 		}
 	}
 
