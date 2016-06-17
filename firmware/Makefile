@@ -79,7 +79,7 @@ OBJDIR = .
 
 
 # List C source files here. (C dependencies are automatically generated.)
-SRC = $(TARGET).c
+SRC = $(TARGET).c adc.c usart.c debug.c
 
 
 # List C++ source files here. (C dependencies are automatically generated.)
