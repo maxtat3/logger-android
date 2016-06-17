@@ -31,8 +31,6 @@ int main(void){
 	sei();
 	
 	ADCSRA |= (1<<ADSC); // запускаем первое АЦП преобразование
-
-	blik_led1();
 	
 	while(1){
 		sym = getCharOfUSART();
