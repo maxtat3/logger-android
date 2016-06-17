@@ -4,7 +4,8 @@
 	<string name="hello_world">Hello world!</string>
 	<string name="action_settings">Settings</string>
 	<string name="activity_settings_title">Logger settings</string>
-	<string name="activity_settings_tooltip_mcu_device_address">Enter bluetooth MCU device address:</string>
+	<string name="activity_settings_tooltip_mcu_device_address">Enter bluetooth MCU device address. Address must be match a pattern:
+XX:XX:XX:XX:XX:XX . Where XX - upper case alphabetic characters in HEX numeric system or digits.</string>
 	<string name="activity_settings_btn_save">Save</string>
 	<string name="activity_settings_btn_cancel">Cancel</string>
 </resources>

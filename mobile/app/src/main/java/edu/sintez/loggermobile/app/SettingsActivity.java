@@ -1,6 +1,7 @@
 package edu.sintez.loggermobile.app;
 
 import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
@@ -29,11 +30,15 @@ public class SettingsActivity extends Activity {
 		btnSaveSettings.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Setting settings = getSettings();
-				settings.setAddress(etAddress.getText().toString());
-				saveSettings(settings);
-				Toast.makeText(getApplicationContext(), "Settings saved", Toast.LENGTH_SHORT).show();
-				finish();
+				if (BluetoothAdapter.checkBluetoothAddress(etAddress.getText().toString())) {
+					Setting settings = getSettings();
+					settings.setAddress(etAddress.getText().toString());
+					saveSettings(settings);
+					Toast.makeText(getApplicationContext(), "Settings saved", Toast.LENGTH_SHORT).show();
+					finish();
+				} else {
+					Toast.makeText(getApplicationContext(), "Incorrect address format !", Toast.LENGTH_LONG).show();
+				}
 			}
 		});
 
