@@ -1,13 +1,15 @@
 #include "usart.h"
 
-volatile unsigned char usartRxBuf = 0;	//однобайтный буфер
+/* Однобайтный буфер */
+volatile unsigned char usartRxBuf = 0;
 
-// прием символа по usart`у в буфер
+/*
+* Прием символа по usart`у в буфер
+*/
 ISR(USART_RXC_vect){ 
    usartRxBuf = UDR;  
 } 
 
-// настройка USART
 void init_usart(void){
 	// UBRR=47 @ 19200 бод при 14,7456 MHz (U2X = 0)
 	// самый оптимальный вариант (16 выб/с для 4 канала)
@@ -32,13 +34,11 @@ void init_usart(void){
 	UCSRC=(1<<URSEL)|(1<<UCSZ1)|(1<<UCSZ0);  //размер слова 8 разрядов
 }
 
-// отправка символа по usart`у
 void sendCharToUSART(unsigned char sym){
 	while(!(UCSRA & (1<<UDRE)));
 	UDR = sym;  
 }
 
-// чтение буфера
 unsigned char getCharOfUSART(void){
 	unsigned char tmp;
 	ATOMIC_BLOCK(ATOMIC_FORCEON){

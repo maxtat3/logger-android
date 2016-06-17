@@ -25,7 +25,9 @@ volatile unsigned int val1, val2, val3, val4;
 volatile unsigned int adcResult;
 volatile unsigned char lowByte;
 
-// обработка прерывания от ацп
+/*
+* Обработка прерывания от ацп
+*/
 ISR(ADC_vect){
 	// 1. считываем младший и старший байты результата АЦ-преобразования и образуем из них 10-битовый результат
 	lowByte = ADCL;
@@ -57,7 +59,6 @@ ISR(ADC_vect){
 	ADCSRA |= (1<<ADSC);
 }
 
-// настройка АЦП
 void init_adc(void){
 	ADCSRA |= (1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0); // предделитель на 128
 	ADCSRA |= (1<<ADIE);                        // разрешаем прерывание от ацп

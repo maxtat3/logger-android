@@ -7,7 +7,14 @@
 #include <util/atomic.h>
 #include <stdbool.h>
 
+/*
+* Настройка АЦП
+*/
 void init_adc(void);
+
+/*
+* Получение АЦП значения канала 1
+*/
 unsigned int get_adc_val_1(void);
 
 #endif

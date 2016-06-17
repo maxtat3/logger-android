@@ -41,8 +41,6 @@ int main(void){
 			isTranslateData = !isTranslateData;
 		} 
 
-		//----
-
 		if (isTranslateData){
 			sendCharToUSART((unsigned char)(get_adc_val_1()/4));
 			_delay_ms(100);
