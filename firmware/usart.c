@@ -11,23 +11,8 @@ ISR(USART_RXC_vect){
 } 
 
 void init_usart(void){
-	// UBRR=47 @ 19200 бод при 14,7456 MHz (U2X = 0)
-	// самый оптимальный вариант (16 выб/с для 4 канала)
-	// UBRRH = 0;
-	// UBRRL = 47; 
-	
-	//UBRR=95 @ 9600 бод при 14,7456 MHz (U2X = 0)
-	// примерно 15 выб/с для 4 канала
-	// UBRRH = 0;
-	// UBRRL = 95; 
-
-	//UBRR=... @ 38400 бод при 14,7456 MHz (U2X = 0)
-	// UBRRH = 0;
-	// UBRRL = 23; 
-
-	//UBRR=... @ 38400 бод при 8 MHz (U2X = 0)
-	UBRRH = 0;
-	UBRRL = 12; 
+	UBRRH = USART_UBRR_HIGH_PART;
+	UBRRL = USART_UBRR_LOW_PART; 
 	
 	// UCSRA=(1<<U2X);
 	UCSRB=(1<<RXCIE)|(1<<RXEN)|(1<<TXEN); //разр. прерыв при приеме, разр приема, разр передачи.
