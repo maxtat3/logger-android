@@ -3,9 +3,6 @@
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
-#include <util/delay.h>
-#include <util/atomic.h>
-#include <stdbool.h>
 
 /*
 * Настройка АЦП

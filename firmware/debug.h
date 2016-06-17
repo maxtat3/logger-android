@@ -2,10 +2,7 @@
 #define DEBUG_H 
 
 #include <avr/io.h>
-#include <avr/interrupt.h>
 #include <util/delay.h>
-#include <util/atomic.h>
-#include <stdbool.h>
 
 #define		LED1	0b00000001
 #define		LED2	0b00010000
