@@ -92,6 +92,22 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 	private Handler chartHandler;
 	private Handler btHandler;
 
+	/**
+	 * Result object created when user selected record to file.
+	 */
+	private Result results = new Result();
+
+	/**
+	 * Flag indicates turn on or turn of recording measure process.
+	 * States are if <tt>true</tt> recording turn on in process or <tt>false</tt> recording turn off.
+	 */
+	private boolean isRecord = false;
+
+	/**
+	 * Record menu item.
+	 */
+	private MenuItem miRecord;
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -248,6 +264,7 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.menu_main, menu);
+		miRecord = menu.findItem(R.id.mi_action_record);
 		return true;
 	}
 
@@ -265,11 +282,29 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 				item.setIcon(getResources().getDrawable(R.mipmap.ic_start_process_turn_on));
 			} else {
 				item.setIcon(getResources().getDrawable(R.mipmap.ic_start_process_turn_off));
+				if (isRecord) {
+					Recorder.writeToFile(results);
+					isRecord = false;
+					miRecord.setIcon(R.mipmap.ic_recording_turn_off);
+					Toast.makeText(this, "Recorded data saved", Toast.LENGTH_LONG).show();
+				}
 			}
 			isStartMeasure = !isStartMeasure;
 
 			if (connectedThread != null) connectedThread.write("b");
 			startTime = System.currentTimeMillis();
+
+		} else if (item.getItemId() == R.id.mi_action_record) {
+			if (isStartMeasure) {
+				Toast.makeText(this, "In measure process is forbid to change record state !", Toast.LENGTH_LONG).show();
+				return true;
+			}
+			isRecord = !isRecord;
+			if (isRecord) {
+				item.setIcon(getResources().getDrawable(R.mipmap.ic_recording_turn_on));
+			} else {
+				item.setIcon(getResources().getDrawable(R.mipmap.ic_recording_turn_off));
+			}
 
 		} else if (item.getItemId() == R.id.mi_action_refresh) {
 			setupBTConnection();
@@ -389,6 +424,7 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 			if (msg.what == RECEIVE_BT_DATA) {
 				// call this method for add point to chart !
 				wActivity.get().addEntry(msg.arg1);
+				wActivity.get().results.getValues1().add(msg.arg1);
 			}
 		}
 	}
