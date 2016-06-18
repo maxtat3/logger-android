@@ -65,18 +65,31 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 	private static final int RECEIVE_MSG = 1;
 
 	/**
+	 * Dynamic line chart object.
+	 */
+	private LineChart lineChart;
+
+	/**
+	 * Record menu item.
+	 */
+	private MenuItem miRecord;
+
+	private BluetoothAdapter btAdapter = null;
+	private BluetoothSocket btSocket = null;
+	private ConnectedThread connectedThread;
+
+	private Handler chartHandler;
+	private Handler btHandler;
+
+	/**
 	 * Data set line colours.
 	 */
 	private int[] dataSetColors = ColorTemplate.VORDIPLOM_COLORS;
 
 	/**
-	 * Dynamic line chart object.
+	 * Result object created when user selected record to file.
 	 */
-	private LineChart lineChart;
-
-	private BluetoothAdapter btAdapter = null;
-	private BluetoothSocket btSocket = null;
-	private ConnectedThread connectedThread;
+	private Result results = new Result();
 
 	/**
 	 * When started measure process in this variable set beginning time this process.
@@ -89,24 +102,11 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 	 */
 	private boolean isStartMeasure = false;
 
-	private Handler chartHandler;
-	private Handler btHandler;
-
-	/**
-	 * Result object created when user selected record to file.
-	 */
-	private Result results = new Result();
-
 	/**
 	 * Flag indicates turn on or turn of recording measure process.
 	 * States are if <tt>true</tt> recording turn on in process or <tt>false</tt> recording turn off.
 	 */
 	private boolean isRecord = false;
-
-	/**
-	 * Record menu item.
-	 */
-	private MenuItem miRecord;
 
 
 	@Override
