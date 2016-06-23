@@ -323,7 +323,16 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 		}
 		isStartMeasure = !isStartMeasure;
 
-		if (connectedThread != null) connectedThread.write(channel.toString());
+		if (connectedThread != null) {
+			connectedThread.write("t");
+			// this delay may be higher main channels delay in main.c
+			try {
+				Thread.sleep(30);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			connectedThread.write(channel.toString());
+		}
 		startTime = System.currentTimeMillis();
 	}
 

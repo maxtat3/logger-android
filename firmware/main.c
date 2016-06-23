@@ -36,25 +36,22 @@ int main(void){
 	while(1){
 		sym = getCharOfUSART();
 
-		// if(sym == 'b'){
-		// 	isTranslateData = !isTranslateData;
-		// } 
-
-		// if (isTranslateData){
-		// 	sendCharToUSART((unsigned char)(get_adc_val_1()/4));
-		// 	_delay_ms(100);
-		// }
+		if(sym == 't'){
+			isTranslateData = !isTranslateData;
+		} 
 
 		_delay_ms(100); 
 
-		if (sym == '0'){
-			sendCharToUSART((unsigned char)(get_adc_val_0()/4));
-		} else if(sym == '1'){
-			sendCharToUSART((unsigned char)(get_adc_val_1()/4));
-		} else if(sym == '2'){
-			sendCharToUSART((unsigned char)(get_adc_val_2()/4));
-		} else if(sym == '3'){
-			sendCharToUSART((unsigned char)(get_adc_val_3()/4));
+		if (isTranslateData){
+			if (sym == '0'){
+				sendCharToUSART((unsigned char)(get_adc_val_0()/4));
+			} else if(sym == '1'){
+				sendCharToUSART((unsigned char)(get_adc_val_1()/4));
+			} else if(sym == '2'){
+				sendCharToUSART((unsigned char)(get_adc_val_2()/4));
+			} else if(sym == '3'){
+				sendCharToUSART((unsigned char)(get_adc_val_3()/4));
+			}
 		}
 
 		// debug data set 
@@ -67,8 +64,6 @@ int main(void){
 		// } else if(sym == '3'){
 		// 	sendCharToUSART((unsigned char)110);
 		// }
-		
-
 	}
 }
 
