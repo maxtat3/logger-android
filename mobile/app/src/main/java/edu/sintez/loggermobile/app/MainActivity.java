@@ -283,41 +283,11 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		if(item.getItemId() == R.id.mi_action_call_mcu) {
-			// if isStartMeasure flag == false -> reset previous data and start msr
-			// if true -> stop msr
-			if (!isStartMeasure) {
-				lineChart.clear();
-				lineChart.setData(new LineData());
-				addDataSet();
-				lineChart.notifyDataSetChanged();
-				lineChart.invalidate();
-				item.setIcon(getResources().getDrawable(R.mipmap.ic_start_process_turn_on));
-			} else {
-				item.setIcon(getResources().getDrawable(R.mipmap.ic_start_process_turn_off));
-				if (isRecord) {
-					Recorder.writeToFile(results);
-					isRecord = false;
-					miRecord.setIcon(R.mipmap.ic_recording_turn_off);
-					Toast.makeText(this, "Recorded data saved", Toast.LENGTH_LONG).show();
-				}
-			}
-			isStartMeasure = !isStartMeasure;
-
-			if (connectedThread != null) connectedThread.write(channel.toString());
-			startTime = System.currentTimeMillis();
+		if(item.getItemId() == R.id.mi_action_start_stop_process) {
+			actionStartStopProcess(item);
 
 		} else if (item.getItemId() == R.id.mi_action_record) {
-			if (isStartMeasure) {
-				Toast.makeText(this, "In measure process is forbid to change record state !", Toast.LENGTH_LONG).show();
-				return true;
-			}
-			isRecord = !isRecord;
-			if (isRecord) {
-				item.setIcon(getResources().getDrawable(R.mipmap.ic_recording_turn_on));
-			} else {
-				item.setIcon(getResources().getDrawable(R.mipmap.ic_recording_turn_off));
-			}
+			if (actionRecordData(item)) return true;
 
 		} else if (item.getItemId() == R.id.mi_action_refresh) {
 			setupBTConnection();
@@ -328,14 +298,62 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 		return true;
 	}
 
+	/**
+	 * This method must be called on {@link #onOptionsItemSelected} for start or stop measure process action.
+	 * If {@link #isStartMeasure} flag == <tt>false</tt> -> reset previous data and start new msr process.
+	 * If this flag <tt>true</tt></t> -> stop msr process.
+	 *
+	 * @param item start or stop action menu item
+	 */
+	private void actionStartStopProcess(MenuItem item) {
+		if (!isStartMeasure) {
+			lineChart.clear();
+			lineChart.setData(new LineData());
+			addDataSet();
+			lineChart.notifyDataSetChanged();
+			lineChart.invalidate();
+			item.setIcon(getResources().getDrawable(R.mipmap.ic_start_process_turn_on));
+		} else {
+			item.setIcon(getResources().getDrawable(R.mipmap.ic_start_process_turn_off));
+			if (isRecord) {
+				Recorder.writeToFile(results);
+				isRecord = false;
+				miRecord.setIcon(R.mipmap.ic_recording_turn_off);
+				Toast.makeText(this, "Recorded data saved", Toast.LENGTH_LONG).show();
+			}
+		}
+		isStartMeasure = !isStartMeasure;
+
+		if (connectedThread != null) connectedThread.write(channel.toString());
+		startTime = System.currentTimeMillis();
+	}
+
+	/**
+	 * This method must be called on {@link #onOptionsItemSelected} for recording data to file.
+	 *
+	 * @param item record meu item
+	 * @return
+	 */
+	private boolean actionRecordData(MenuItem item) {
+		if (isStartMeasure) {
+			Toast.makeText(this, "In measure process is forbid to change record state !", Toast.LENGTH_LONG).show();
+			return true;
+		}
+		isRecord = !isRecord;
+		if (isRecord) {
+			item.setIcon(getResources().getDrawable(R.mipmap.ic_recording_turn_on));
+		} else {
+			item.setIcon(getResources().getDrawable(R.mipmap.ic_recording_turn_off));
+		}
+		return false;
+	}
+
 	@Override
 	public void onValueSelected(Entry e, int dataSetIndex, Highlight h) {
-
 	}
 
 	@Override
 	public void onNothingSelected() {
-
 	}
 
 	/**
