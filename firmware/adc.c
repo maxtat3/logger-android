@@ -72,3 +72,15 @@ void init_adc(void){
 unsigned int get_adc_val_1(void){
 	return val1;
 }
+
+unsigned int get_adc_val_2(void){
+	return val2;
+}
+
+unsigned int get_adc_val_3(void){
+	return val3;
+}
+
+unsigned int get_adc_val_4(void){
+	return val4;
+}

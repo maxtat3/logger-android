@@ -65,6 +65,11 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 	private static final int RECEIVE_MSG = 1;
 
 	/**
+	 * Max amount of channels in measure process involved.
+	 */
+	private static final int MAX_CHANNELS = 4;
+
+	/**
 	 * Dynamic line chart object.
 	 */
 	private LineChart lineChart;
@@ -107,6 +112,17 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 	 * States are if <tt>true</tt> recording turn on in process or <tt>false</tt> recording turn off.
 	 */
 	private boolean isRecord = false;
+
+	/**
+	 * Channel counter. Pointed to current handled channel.
+	 * For 4 total channels this counter accept values are [0, 1, 2, 3].
+	 */
+	private Integer channel = 0;
+
+	/**
+	 * Buffer for values of all channels {@link #MAX_CHANNELS} in full iteration.
+	 */
+	private float[] valuesOfChannelsBuf = new float[4];
 
 
 	@Override
@@ -291,7 +307,7 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 			}
 			isStartMeasure = !isStartMeasure;
 
-			if (connectedThread != null) connectedThread.write("b");
+			if (connectedThread != null) connectedThread.write(channel.toString());
 			startTime = System.currentTimeMillis();
 
 		} else if (item.getItemId() == R.id.mi_action_record) {
@@ -325,7 +341,9 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 
 	}
 
-	private void addEntry(float val1) {
+	/* channel = [0 ... 3] */
+	private void addEntry(int channel, float val) {
+		Log.d(LOG, "channel = " + channel + " | " + "val = " + val);
 		LineData data = lineChart.getData();
 
 		if(data != null) {
@@ -336,10 +354,29 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 				data.addDataSet(set);
 			}
 
-			// add a new x-value first
-			getRealTime();
-			data.addXValue(getRealTime());
-			data.addEntry(new Entry(val1, set.getEntryCount()), 0);
+//			data.addEntry(new Entry(val, set.getEntryCount()), channel - 1);
+			switch (channel) {
+				case 0:
+					valuesOfChannelsBuf[0] = val;
+					break;
+				case 1:
+					valuesOfChannelsBuf[1] = val;
+					break;
+				case 2:
+					valuesOfChannelsBuf[2] = val;
+					break;
+				case 3:
+					valuesOfChannelsBuf[3] = val;
+					break;
+			}
+			if (channel == MAX_CHANNELS - 1) {
+				for (int ch = 0; ch < MAX_CHANNELS; ch++) {
+					data.addEntry(new Entry(valuesOfChannelsBuf[ch], set.getEntryCount()), ch);
+				}
+				// add a new x-value first
+				getRealTime();
+				data.addXValue(getRealTime());
+			}
 
 			lineChart.notifyDataSetChanged();
 
@@ -362,29 +399,32 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 
 		if(data != null) {
 //			log("data.getDataSetCount() = " + data.getDataSetCount());
-			int count = (data.getDataSetCount() + 1);
+//			int count = (data.getDataSetCount() + 1);
 //			log("data.getDataSetCount() = " + data.getDataSetCount());
 
 			// create 10 y-vals
-			ArrayList<Entry> yVals = new ArrayList<Entry>();
+//			ArrayList<Entry> yVals = new ArrayList<Entry>();
 
 //			log("data.getXValCount() = " + (data.getXValCount()));
 
-			LineDataSet set = new LineDataSet(yVals, "DataSet " + count);
-			set.setLineWidth(2.5f);
-			set.setCircleRadius(0);
+			// i - is channel counter
+			for (int i = 0 ; i < MAX_CHANNELS; i++) {
+				LineDataSet set = new LineDataSet(new ArrayList<Entry>(), "DataSet " + i);
+				set.setLineWidth(2.5f);
+				set.setCircleRadius(0);
 
-			int color = dataSetColors[count % dataSetColors.length];
+				int color = dataSetColors[i % dataSetColors.length];
 
-			set.setColor(color);
-			set.setCircleColor(color);
-			set.setHighLightColor(color);
-			set.setValueTextSize(10f);
-			set.setValueTextColor(color);
+				set.setColor(color);
+				set.setCircleColor(color);
+				set.setHighLightColor(color);
+				set.setValueTextSize(10f);
+				set.setValueTextColor(color);
 
-			data.addDataSet(set);
-			lineChart.notifyDataSetChanged();
-			lineChart.invalidate();
+				data.addDataSet(set);
+				lineChart.notifyDataSetChanged();
+				lineChart.invalidate();
+			}
 		}
 	}
 
@@ -422,9 +462,16 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 		public void handleMessage(Message msg) {
 //				super.handleMessage(msg);
 			if (msg.what == RECEIVE_BT_DATA) {
+//				Log.d(LOG, "RX chart = " + msg.arg1);
+
 				// call this method for add point to chart !
-				wActivity.get().addEntry(msg.arg1);
-				wActivity.get().results.getValues1().add(msg.arg1);
+				wActivity.get().addEntry(wActivity.get().channel, msg.arg1);
+//				wActivity.get().results.getValues1().add(msg.arg1);
+
+				wActivity.get().channel++;
+//				Log.d(LOG, "wActivity.get().channel = " + wActivity.get().channel);
+				if (wActivity.get().channel == MAX_CHANNELS) wActivity.get().channel = 0;
+				wActivity.get().connectedThread.write(wActivity.get().channel.toString());
 			}
 		}
 	}

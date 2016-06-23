@@ -17,7 +17,8 @@
 #include "usart.h"
 #include "debug.h"
 
-
+// If this flag true - command for start measure process and sending data to USART
+// otherwise - command for start measure process.
 bool isTranslateData = false;
 
 
@@ -35,14 +36,38 @@ int main(void){
 	while(1){
 		sym = getCharOfUSART();
 
-		if(sym == 'b'){
-			isTranslateData = !isTranslateData;
-		} 
+		// if(sym == 'b'){
+		// 	isTranslateData = !isTranslateData;
+		// } 
 
-		if (isTranslateData){
+		// if (isTranslateData){
+		// 	sendCharToUSART((unsigned char)(get_adc_val_1()/4));
+		// 	_delay_ms(100);
+		// }
+
+		_delay_ms(100); 
+
+		if (sym == '0'){
 			sendCharToUSART((unsigned char)(get_adc_val_1()/4));
-			_delay_ms(100);
+		} else if(sym == '1'){
+			sendCharToUSART((unsigned char)(get_adc_val_2()/4));
+		} else if(sym == '2'){
+			sendCharToUSART((unsigned char)(get_adc_val_3()/4));
+		} else if(sym == '3'){
+			sendCharToUSART((unsigned char)(get_adc_val_4()/4));
 		}
+
+		// debug data set 
+		// if (sym == '0'){
+		// 	sendCharToUSART((unsigned char)30);
+		// } else if(sym == '1'){
+		// 	sendCharToUSART((unsigned char)50);
+		// } else if(sym == '2'){
+		// 	sendCharToUSART((unsigned char)70);
+		// } else if(sym == '3'){
+		// 	sendCharToUSART((unsigned char)110);
+		// }
+		
 
 	}
 }

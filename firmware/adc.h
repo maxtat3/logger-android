@@ -14,4 +14,19 @@ void init_adc(void);
 */
 unsigned int get_adc_val_1(void);
 
+/*
+* Получение АЦП значения канала 2
+*/
+unsigned int get_adc_val_2(void);
+
+/*
+* Получение АЦП значения канала 3
+*/
+unsigned int get_adc_val_3(void);
+
+/*
+* Получение АЦП значения канала 4
+*/
+unsigned int get_adc_val_4(void);
+
 #endif
