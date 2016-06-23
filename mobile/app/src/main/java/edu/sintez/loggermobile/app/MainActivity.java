@@ -520,14 +520,9 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 		public void handleMessage(android.os.Message msg) {
 			switch (msg.what) {
 				case RECEIVE_MSG:
-					byte[] readBuf = (byte[]) msg.obj;
-					String strIncom = new String(readBuf, 0, msg.arg1);
-					char[] chars = strIncom.toCharArray();
-//						for (char aChar : chars) {
-//							Log.d(LOG, "> char = "  +(byte)aChar);
-//							log( "> char = "  +(byte)aChar);
-//						}
-					Message msg1 = wActivity.get().chartHandler.obtainMessage(RECEIVE_BT_DATA, chars[0], 0);
+					byte[] byteBuf = (byte[]) msg.obj;
+					char[] charBuf = new String(byteBuf, 0, msg.arg1).toCharArray();
+					Message msg1 = wActivity.get().chartHandler.obtainMessage(RECEIVE_BT_DATA, charBuf[0], 0);
 					wActivity.get().chartHandler.sendMessage(msg1);
 					break;
 			}
