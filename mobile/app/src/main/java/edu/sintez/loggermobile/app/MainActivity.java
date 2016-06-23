@@ -199,6 +199,9 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 		}
 	}
 
+	/**
+	 * Attempt ot connection to BT MCU device.
+	 */
 	private void setupBTConnection() {
 		log("Try connection ...");
 		// Set up a pointer to the remote node using it's address.
@@ -335,7 +338,13 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 
 	}
 
-	/* channel = [0 ... 3] */
+	/**
+	 * Add point to chart for any channel.
+	 *
+	 * @param channel channel where necessary set value in chart.
+	 *                For 4 channels values this var are [0 ... 3].
+	 * @param val value from selected channel.
+	 */
 	private void addEntry(int channel, float val) {
 		Log.d(LOG, "channel = " + channel + " | " + "val = " + val);
 		LineData data = lineChart.getData();
@@ -381,6 +390,11 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 		}
 	}
 
+	/**
+	 * Getting system real time.
+	 *
+	 * @return time in MM:SS match pattern format.
+	 */
 	private String getRealTime(){
 		long processTime = System.currentTimeMillis() - startTime;
 		int seconds = (int) (processTime / 1000) % 60 ;
@@ -388,6 +402,9 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 		return minutes + ":" + seconds;
 	}
 
+	/**
+	 * Add data set to one channel in chart.
+	 */
 	private void addDataSet() {
 		LineData data = lineChart.getData();
 
@@ -422,6 +439,11 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 		}
 	}
 
+	/**
+	 * Creating general data set design.
+	 *
+	 * @return linear data set object.
+	 */
 	private LineDataSet createSet() {
 		LineDataSet set = new LineDataSet(null, "DataSet 1");
 		set.setLineWidth(2.5f);
@@ -445,6 +467,9 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 		}
 	}
 
+	/**
+	 * Handler for update chart in UI thread.
+	 */
 	private static class ChartHandler extends Handler {
 		WeakReference<MainActivity> wActivity;
 
@@ -470,6 +495,13 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 		}
 	}
 
+	/**
+	 * Handler serving receiving (RX) data from BT MCU device.
+	 * When in {@link ConnectedThread} received data called this handler
+	 * for asynchronous update chart in UI thread.
+	 *
+	 * @see ChartHandler
+	 */
 	private static class BTHandler extends Handler{
 		WeakReference<MainActivity> wActivity;
 
