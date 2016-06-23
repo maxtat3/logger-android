@@ -69,18 +69,18 @@ void init_adc(void){
 	//ADMUX|=0b11000001;
 }
 
-unsigned int get_adc_val_1(void){
+unsigned int get_adc_val_0(void){
 	return val1;
 }
 
-unsigned int get_adc_val_2(void){
+unsigned int get_adc_val_1(void){
 	return val2;
 }
 
-unsigned int get_adc_val_3(void){
+unsigned int get_adc_val_2(void){
 	return val3;
 }
 
-unsigned int get_adc_val_4(void){
+unsigned int get_adc_val_3(void){
 	return val4;
 }

@@ -48,13 +48,13 @@ int main(void){
 		_delay_ms(100); 
 
 		if (sym == '0'){
-			sendCharToUSART((unsigned char)(get_adc_val_1()/4));
+			sendCharToUSART((unsigned char)(get_adc_val_0()/4));
 		} else if(sym == '1'){
-			sendCharToUSART((unsigned char)(get_adc_val_2()/4));
+			sendCharToUSART((unsigned char)(get_adc_val_1()/4));
 		} else if(sym == '2'){
-			sendCharToUSART((unsigned char)(get_adc_val_3()/4));
+			sendCharToUSART((unsigned char)(get_adc_val_2()/4));
 		} else if(sym == '3'){
-			sendCharToUSART((unsigned char)(get_adc_val_4()/4));
+			sendCharToUSART((unsigned char)(get_adc_val_3()/4));
 		}
 
 		// debug data set 
