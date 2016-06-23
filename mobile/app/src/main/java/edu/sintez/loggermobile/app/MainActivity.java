@@ -42,11 +42,6 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 	private static final UUID BT_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
 	/**
-	 * MAC address bluetooth (BT) module. This BT module placed in mcu device.
-	 */
-	public static final String BT_DEVICE_ADDRESS = "20:11:02:47:01:60"; //for H-C-2010-06-01
-
-	/**
 	 * Request to enable BT module in android device if he is turn off.
 	 */
 	private static final int REQUEST_ENABLE_BT = 1;
