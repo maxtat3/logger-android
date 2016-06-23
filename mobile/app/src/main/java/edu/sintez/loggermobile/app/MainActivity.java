@@ -183,6 +183,7 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 		}
 	}
 
+	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		switch (requestCode) {
 			case REQUEST_ENABLE_BT:
