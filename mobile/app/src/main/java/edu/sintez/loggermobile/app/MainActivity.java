@@ -142,7 +142,6 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 		log("@onresume");
 		super.onResume();
 		if (checkBTState()) {
-			getDeviceList();
 			setupBTConnection();
 		}
 	}
@@ -474,17 +473,6 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 		set.setAxisDependency(YAxis.AxisDependency.LEFT);
 		set.setValueTextSize(10f);
 		return set;
-	}
-
-	private void getDeviceList() {
-		Set<BluetoothDevice> bondedDevices = btAdapter.getBondedDevices();
-		for (BluetoothDevice device : bondedDevices) {
-			log("device = " + device);
-			log("device.getName() = " + device.getName());
-			log("device.getAddress() = " + device.getAddress());
-			log("device.getBondState() = " + device.getBondState());
-			log("---");
-		}
 	}
 
 	/**
