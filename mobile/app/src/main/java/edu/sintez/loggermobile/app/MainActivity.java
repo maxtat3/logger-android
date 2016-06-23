@@ -287,7 +287,7 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 			actionStartStopProcess(item);
 
 		} else if (item.getItemId() == R.id.mi_action_record) {
-			if (actionRecordData(item)) return true;
+			actionRecordData(item);
 
 		} else if (item.getItemId() == R.id.mi_action_refresh) {
 			setupBTConnection();
@@ -330,14 +330,16 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 
 	/**
 	 * This method must be called on {@link #onOptionsItemSelected} for recording data to file.
+	 * Set or reset flag {@link #isRecord} for record process opportunity.
 	 *
 	 * @param item record meu item
-	 * @return
+	 * @return <tt>true</tt> -  flag {@link #isRecord} set. Otherwise <tt>false</tt> - flag not set because
+	 *          measure process started
 	 */
 	private boolean actionRecordData(MenuItem item) {
 		if (isStartMeasure) {
 			Toast.makeText(this, "In measure process is forbid to change record state !", Toast.LENGTH_LONG).show();
-			return true;
+			return false;
 		}
 		isRecord = !isRecord;
 		if (isRecord) {
@@ -345,7 +347,7 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 		} else {
 			item.setIcon(getResources().getDrawable(R.mipmap.ic_recording_turn_off));
 		}
-		return false;
+		return true;
 	}
 
 	@Override
