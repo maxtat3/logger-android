@@ -225,12 +225,9 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 		switch (requestCode) {
 			case REQUEST_ENABLE_BT:
 				// When the request to enable Bluetooth returns
-				if (resultCode == Activity.RESULT_OK) {
-//					getDeviceList();
-//					setupBTConnection();
-				} else {
+				if (resultCode != Activity.RESULT_OK) {
 					// User did not enable Bluetooth or an error occurred
-					log("BT not enabled");
+					log("BT not enabled or not supported in this device.");
 					showMsgErrorAndExit("", "Bluetooth is not enabled. Exit Logger.");
 				}
 		}
