@@ -20,7 +20,7 @@
 		  android:title="@string/menu_refresh_conn"
 		  android:orderInCategory="100"
 		  android:showAsAction="ifRoom"
-		  android:icon="@android:drawable/ic_dialog_map"
+		  android:icon="@mipmap/ic_refresh_conn"
 		/>
 
 	<item android:id="@+id/mi_action_settings"
