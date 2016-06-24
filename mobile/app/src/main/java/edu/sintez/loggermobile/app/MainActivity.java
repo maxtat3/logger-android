@@ -1,6 +1,7 @@
 package edu.sintez.loggermobile.app;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
@@ -58,6 +59,21 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 	public static final int RECEIVE_MSG = 1;
 
 	/**
+	 * Application in connection process.
+	 */
+	public static final int STATUS_CONNECTION = 1;
+
+	/**
+	 * Application connected to BT MCU device.
+	 */
+	public static final int STATUS_CONNECTED = 2;
+
+	/**
+	 * Application unable to connect.
+	 */
+	public static final int STATUS_CONNECTION_ERROR = 3;
+
+	/**
 	 * Max amount of channels in measure process involved.
 	 */
 	private static final int MAX_CHANNELS = 4;
@@ -76,8 +92,14 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 	private BluetoothSocket btSocket = null;
 	private ConnectedThread connectedThread;
 
+	private Handler connHandler;
 	private Handler chartHandler;
 	private Handler btHandler;
+
+	/**
+	 * Show easy progress when trying to connect BT MCU device.
+	 */
+	ProgressDialog connDialog = null;
 
 	/**
 	 * Data set line colours.
@@ -128,13 +150,25 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 
 		lineChart = (LineChart) findViewById(R.id.line_chart);
 
+		connHandler = new ConnectionHandler(this);
 		chartHandler = new ChartHandler(this);
 		btHandler = new BTHandler(this);
 
+		connectingDialogInit();
 		chartInit();
 		addDataSet();
 
 		btAdapter = BluetoothAdapter.getDefaultAdapter();
+	}
+
+	/**
+	 * Initialization connecting dialog when trying to connect BT MCU device.
+	 */
+	private void connectingDialogInit(){
+		connDialog = new ProgressDialog(this);
+		connDialog.setCancelable(true);
+		connDialog.setMessage("Try connect to " + getAddressFromInternal() + " device");
+		connDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 	}
 
 	@Override
@@ -216,25 +250,35 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 		}
 		btAdapter.cancelDiscovery();
 
-		// Establish the connection. This will block until it connects.
-		log("Connecting ...");
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				// Establish the connection. This will block until it connects.
+				log("Connecting ...");
 //		if (btSocket != null) log("bts NOT null"); else log("bts is null");
-		try {
-			btSocket.connect();
-			log("Connecting and ready do sending data !");
+				try {
+					connHandler.sendEmptyMessage(STATUS_CONNECTION);
+					btSocket.connect();
 
-			log("Create data stream ...");
-			connectedThread = new ConnectedThread(btSocket, btHandler);
-			connectedThread.start();
-			log("Data stream created !");
-		} catch (IOException e) {
-			try {
-				log("bts close");
-				btSocket.close();
-			} catch (IOException e2) {
-				showMsgErrorAndExit("Fatal Error", "In onResume() and unable to close socket during connection failure" + e2.getMessage() + ".");
+					log("Connecting and ready do sending data !");
+					log("Create data stream ...");
+					connectedThread = new ConnectedThread(btSocket, btHandler);
+					connectedThread.start();
+					connHandler.sendEmptyMessage(STATUS_CONNECTED);
+					log("Data stream created !");
+				} catch (IOException e) {
+					try {
+						log("bts close");
+						connHandler.sendEmptyMessage(STATUS_CONNECTION_ERROR);
+						btSocket.close();
+					} catch (IOException e2) {
+						showMsgErrorAndExit("Fatal Error", "In onResume() and unable to close socket during connection failure" + e2.getMessage() + ".");
+					}
+				}
 			}
-		}
+		}).start();
+
+
 	}
 
 	/**
@@ -482,6 +526,47 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 		set.setAxisDependency(YAxis.AxisDependency.LEFT);
 		set.setValueTextSize(10f);
 		return set;
+	}
+
+	/**
+	 * Show progress (connection) dialog in this process and
+	 * show status Toast massages.
+	 *
+	 * @see #connDialog
+	 */
+	private static class ConnectionHandler extends Handler{
+		WeakReference<MainActivity> wActivity;
+
+		public ConnectionHandler(MainActivity activity) {
+			wActivity = new WeakReference<MainActivity>(activity);
+		}
+
+		public void handleMessage(android.os.Message msg) {
+			switch (msg.what) {
+				case STATUS_CONNECTION:
+					wActivity.get().connDialog.show();
+					wActivity.get().connDialog.setCanceledOnTouchOutside(false);
+					break;
+
+				case STATUS_CONNECTED:
+					wActivity.get().connDialog.dismiss();
+					Toast.makeText(
+						wActivity.get().getBaseContext(),
+						"Connected",
+						Toast.LENGTH_LONG
+					).show();
+					break;
+
+				case STATUS_CONNECTION_ERROR:
+					Toast.makeText(
+						wActivity.get().getBaseContext(),
+						"Unable connected to " + wActivity.get().getAddressFromInternal() + " device",
+						Toast.LENGTH_LONG
+					).show();
+					wActivity.get().connDialog.dismiss();
+					break;
+			}
+		}
 	}
 
 	/**
