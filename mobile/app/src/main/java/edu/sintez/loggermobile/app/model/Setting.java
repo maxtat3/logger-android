@@ -1,4 +1,4 @@
-package edu.sintez.loggermobile.app;
+package edu.sintez.loggermobile.app.model;
 
 /**
  * Settings which contain this application.

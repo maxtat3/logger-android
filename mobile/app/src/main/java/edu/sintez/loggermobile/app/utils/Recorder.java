@@ -1,7 +1,8 @@
-package edu.sintez.loggermobile.app;
+package edu.sintez.loggermobile.app.utils;
 
 import android.os.Environment;
-import android.util.Log;
+import edu.sintez.loggermobile.app.activity.MainActivity;
+import edu.sintez.loggermobile.app.model.Result;
 
 import java.io.File;
 import java.io.FileWriter;

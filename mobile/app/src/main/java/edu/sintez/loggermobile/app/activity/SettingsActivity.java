@@ -1,4 +1,4 @@
-package edu.sintez.loggermobile.app;
+package edu.sintez.loggermobile.app.activity;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -8,6 +8,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+import edu.sintez.loggermobile.app.R;
+import edu.sintez.loggermobile.app.model.Setting;
 
 public class SettingsActivity extends Activity {
 

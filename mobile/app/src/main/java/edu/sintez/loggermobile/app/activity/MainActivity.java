@@ -1,4 +1,4 @@
-package edu.sintez.loggermobile.app;
+package edu.sintez.loggermobile.app.activity;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -25,11 +25,15 @@ import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.ColorTemplate;
+import edu.sintez.loggermobile.app.*;
+import edu.sintez.loggermobile.app.async.ConnectedThread;
+import edu.sintez.loggermobile.app.model.Result;
+import edu.sintez.loggermobile.app.model.Setting;
+import edu.sintez.loggermobile.app.utils.Recorder;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Set;
 import java.util.UUID;
 
 public class MainActivity extends Activity implements OnChartValueSelectedListener {

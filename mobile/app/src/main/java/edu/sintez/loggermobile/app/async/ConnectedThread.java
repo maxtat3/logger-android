@@ -1,8 +1,9 @@
-package edu.sintez.loggermobile.app;
+package edu.sintez.loggermobile.app.async;
 
 import android.bluetooth.BluetoothSocket;
 import android.os.Handler;
 import android.util.Log;
+import edu.sintez.loggermobile.app.activity.MainActivity;
 
 import java.io.IOException;
 import java.io.InputStream;
