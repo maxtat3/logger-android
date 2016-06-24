@@ -83,6 +83,13 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 	 */
 	public static final int MAX_CHANNELS = 4;
 
+	private enum ConnectionState {
+		CONNECTED,
+		NOT_CONNECTION
+	}
+
+	private ConnectionState connState = ConnectionState.NOT_CONNECTION;
+
 	/**
 	 * Dynamic line chart object.
 	 */
@@ -348,6 +355,11 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 	 * @param item start or stop action menu item
 	 */
 	private void actionStartStopProcess(MenuItem item) {
+		if (connState == ConnectionState.NOT_CONNECTION) {
+			Toast.makeText(this, "No connection", Toast.LENGTH_SHORT).show();
+			return;
+		}
+
 		if (!isStartMeasure) {
 			lineChart.clear();
 			lineChart.setData(new LineData());
@@ -388,6 +400,11 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 	 *          measure process started
 	 */
 	private boolean actionRecordData(MenuItem item) {
+		if (connState == ConnectionState.NOT_CONNECTION) {
+			Toast.makeText(this, "No connection", Toast.LENGTH_SHORT).show();
+			return false;
+		}
+
 		if (isStartMeasure) {
 			Toast.makeText(this, "In measure process is forbid to change record state !", Toast.LENGTH_LONG).show();
 			return false;
@@ -544,6 +561,7 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 					break;
 
 				case STATUS_CONNECTED:
+					wActivity.get().connState = ConnectionState.CONNECTED;
 					wActivity.get().connDialog.dismiss();
 					Toast.makeText(
 						wActivity.get().getBaseContext(),
@@ -553,12 +571,13 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 					break;
 
 				case STATUS_CONNECTION_ERROR:
+					wActivity.get().connState = ConnectionState.NOT_CONNECTION;
+					wActivity.get().connDialog.dismiss();
 					Toast.makeText(
 						wActivity.get().getBaseContext(),
 						"Unable connected to " + wActivity.get().getAddressFromInternal() + " device",
 						Toast.LENGTH_LONG
 					).show();
-					wActivity.get().connDialog.dismiss();
 					break;
 			}
 		}
