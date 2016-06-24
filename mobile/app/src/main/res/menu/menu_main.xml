@@ -3,28 +3,28 @@
 	  tools:context=".MainActivity">
 
 	<item android:id="@+id/mi_action_start_stop_process"
-		  android:title="Start measure process"
+		  android:title="@string/menu_start_msr"
 		  android:orderInCategory="100"
 		  android:showAsAction="ifRoom"
 		  android:icon="@mipmap/ic_start_process_turn_off"
 		/>
 
 	<item android:id="@+id/mi_action_record"
-		  android:title="Record"
+		  android:title="@string/menu_record"
 		  android:orderInCategory="100"
 		  android:showAsAction="ifRoom"
 		  android:icon="@mipmap/ic_recording_turn_off"
 		/>
 
 	<item android:id="@+id/mi_action_refresh"
-		  android:title="Refresh"
+		  android:title="@string/menu_refresh_conn"
 		  android:orderInCategory="100"
 		  android:showAsAction="ifRoom"
 		  android:icon="@android:drawable/ic_dialog_map"
 		/>
 
 	<item android:id="@+id/mi_action_settings"
-		  android:title="Settings"
+		  android:title="@string/menu_settings"
 		  android:orderInCategory="100"
 		  android:showAsAction="ifRoom"
 		  android:icon="@mipmap/ic_settings"

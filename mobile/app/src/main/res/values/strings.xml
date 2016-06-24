@@ -8,4 +8,8 @@
 XX:XX:XX:XX:XX:XX . Where XX - upper case alphabetic characters in HEX numeric system or digits.</string>
 	<string name="activity_settings_btn_save">Save</string>
 	<string name="activity_settings_btn_cancel">Cancel</string>
+	<string name="menu_start_msr">Start measure process</string>
+	<string name="menu_record">Record</string>
+	<string name="menu_refresh_conn">Refresh connection</string>
+	<string name="menu_settings">Settings</string>
 </resources>
