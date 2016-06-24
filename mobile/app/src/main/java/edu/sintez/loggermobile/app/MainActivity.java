@@ -193,7 +193,6 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 				log("Bluetooth turn on .");
 				return true;
 			} else {
-				// Prompt user to turn on Bluetooth
 				Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
 				startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
 				return false;
@@ -237,12 +236,11 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 	 */
 	private void setupBTConnection() {
 		log("Try connection ...");
-		// Set up a pointer to the remote node using it's address.
 		BluetoothDevice device = btAdapter.getRemoteDevice(getAddressFromInternal());
 
 		// Two things are needed to make a connection:
-		//      A MAC address, which we got above.
-		//      A Service ID or UUID. In this case we are using the UUID for SPP.
+		// - MAC address, which we got above.
+		// - Service ID or UUID. In this case we are using the UUID for SPP.
 		try {
 			btSocket = device.createRfcommSocketToServiceRecord(BT_UUID);
 		} catch (IOException e) {
@@ -255,7 +253,6 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 			public void run() {
 				// Establish the connection. This will block until it connects.
 				log("Connecting ...");
-//		if (btSocket != null) log("bts NOT null"); else log("bts is null");
 				try {
 					connHandler.sendEmptyMessage(STATUS_CONNECTION);
 					btSocket.connect();
@@ -418,7 +415,7 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 	 * @param val value from selected channel.
 	 */
 	private void addEntry(int channel, float val) {
-		Log.d(LOG, "channel = " + channel + " | " + "val = " + val);
+		log("channel = " + channel + " | " + "val = " + val);
 		LineData data = lineChart.getData();
 
 		if(data != null) {
@@ -429,7 +426,6 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 				data.addDataSet(set);
 			}
 
-//			data.addEntry(new Entry(val, set.getEntryCount()), channel - 1);
 			switch (channel) {
 				case 0:
 					valuesOfChannelsBuf[0] = val;
@@ -457,7 +453,7 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 
 			lineChart.setVisibleXRangeMaximum(300);
 			lineChart.setVisibleYRangeMaximum(200, YAxis.AxisDependency.LEFT);
-//          // this automatically refreshes the chart (calls invalidate())
+			// this automatically refreshes the chart (calls invalidate())
 			lineChart.moveViewTo(data.getXValCount()-7, 50f, YAxis.AxisDependency.LEFT);
 		}
 	}
@@ -481,22 +477,12 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 		LineData data = lineChart.getData();
 
 		if(data != null) {
-//			log("data.getDataSetCount() = " + data.getDataSetCount());
-//			int count = (data.getDataSetCount() + 1);
-//			log("data.getDataSetCount() = " + data.getDataSetCount());
-
-			// create 10 y-vals
-//			ArrayList<Entry> yVals = new ArrayList<Entry>();
-
-//			log("data.getXValCount() = " + (data.getXValCount()));
-
-			// i - is channel counter
-			for (int i = 0 ; i < MAX_CHANNELS; i++) {
-				LineDataSet set = new LineDataSet(new ArrayList<Entry>(), "DataSet " + i);
+			for (int ch = 0 ; ch < MAX_CHANNELS; ch++) {
+				LineDataSet set = new LineDataSet(new ArrayList<Entry>(), "DataSet " + ch);
 				set.setLineWidth(2.5f);
 				set.setCircleRadius(0);
 
-				int color = dataSetColors[i % dataSetColors.length];
+				int color = dataSetColors[ch % dataSetColors.length];
 
 				set.setColor(color);
 				set.setCircleColor(color);
@@ -528,6 +514,12 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 		return set;
 	}
 
+	/*
+	 * ----------------------------------
+	 *      Handlers for update UI
+	 * ----------------------------------
+	 */
+
 	/**
 	 * Show progress (connection) dialog in this process and
 	 * show status Toast massages.
@@ -541,6 +533,7 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 			wActivity = new WeakReference<MainActivity>(activity);
 		}
 
+		@Override
 		public void handleMessage(android.os.Message msg) {
 			switch (msg.what) {
 				case STATUS_CONNECTION:
@@ -581,16 +574,11 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 
 		@Override
 		public void handleMessage(Message msg) {
-//				super.handleMessage(msg);
 			if (msg.what == RECEIVE_BT_DATA) {
-//				Log.d(LOG, "RX chart = " + msg.arg1);
-
-				// call this method for add point to chart !
 				wActivity.get().addEntry(wActivity.get().channel, msg.arg1);
 //				wActivity.get().results.getValues1().add(msg.arg1);
 
 				wActivity.get().channel++;
-//				Log.d(LOG, "wActivity.get().channel = " + wActivity.get().channel);
 				if (wActivity.get().channel == MAX_CHANNELS) wActivity.get().channel = 0;
 				wActivity.get().connectedThread.write(wActivity.get().channel.toString());
 			}
@@ -611,6 +599,7 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 			wActivity = new WeakReference<MainActivity>(activity);
 		}
 
+		@Override
 		public void handleMessage(android.os.Message msg) {
 			switch (msg.what) {
 				case RECEIVE_MSG:
