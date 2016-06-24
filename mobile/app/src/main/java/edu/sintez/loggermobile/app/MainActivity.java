@@ -74,6 +74,11 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 	public static final int STATUS_CONNECTION_ERROR = 3;
 
 	/**
+	 * Command to BT MCU device to start and stop process.
+	 */
+	private static final String START_STOP_CMD = "t";
+
+	/**
 	 * Max amount of channels in measure process involved.
 	 */
 	public static final int MAX_CHANNELS = 4;
@@ -99,7 +104,7 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 	/**
 	 * Show easy progress when trying to connect BT MCU device.
 	 */
-	ProgressDialog connDialog = null;
+	private ProgressDialog connDialog = null;
 
 	/**
 	 * Data set line colours.
@@ -173,7 +178,7 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 
 	@Override
 	public void onResume() {
-		log("@onresume");
+		log("@onResume");
 		super.onResume();
 		if (checkBTState()) {
 			setupBTConnection();
@@ -365,7 +370,7 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 		isStartMeasure = !isStartMeasure;
 
 		if (connectedThread != null) {
-			connectedThread.write("t");
+			connectedThread.write(START_STOP_CMD);
 			// this delay may be higher main channels delay in main.c
 			try {
 				Thread.sleep(30);
