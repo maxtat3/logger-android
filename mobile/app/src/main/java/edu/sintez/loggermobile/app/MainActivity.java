@@ -76,7 +76,7 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 	/**
 	 * Max amount of channels in measure process involved.
 	 */
-	private static final int MAX_CHANNELS = 4;
+	public static final int MAX_CHANNELS = 4;
 
 	/**
 	 * Dynamic line chart object.
@@ -576,7 +576,24 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 		public void handleMessage(Message msg) {
 			if (msg.what == RECEIVE_BT_DATA) {
 				wActivity.get().addEntry(wActivity.get().channel, msg.arg1);
-//				wActivity.get().results.getValues1().add(msg.arg1);
+				if (wActivity.get().isRecord) {
+
+					switch (wActivity.get().channel) {
+						case 0:
+							wActivity.get().results.getValues0().add(msg.arg1);
+							break;
+						case 1:
+							wActivity.get().results.getValues1().add(msg.arg1);
+							break;
+						case 2:
+							wActivity.get().results.getValues2().add(msg.arg1);
+							break;
+						case 3:
+							wActivity.get().results.getValues3().add(msg.arg1);
+							break;
+					}
+
+				}
 
 				wActivity.get().channel++;
 				if (wActivity.get().channel == MAX_CHANNELS) wActivity.get().channel = 0;
