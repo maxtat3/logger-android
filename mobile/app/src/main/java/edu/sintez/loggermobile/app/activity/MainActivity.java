@@ -353,7 +353,8 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 			actionRecordData(item);
 
 		} else if (item.getItemId() == R.id.mi_action_refresh) {
-			setupBTConnection();
+			if (connState == ConnectionState.NOT_CONNECTION) setupBTConnection();
+			else Toast.makeText(this, "Already connected", Toast.LENGTH_SHORT).show();
 
 		} else if (item.getItemId() == R.id.mi_action_settings) {
 			startActivity(new Intent(this, SettingsActivity.class));
