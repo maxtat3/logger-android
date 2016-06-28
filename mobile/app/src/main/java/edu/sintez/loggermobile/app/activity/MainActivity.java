@@ -52,6 +52,16 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 	private static final int REQUEST_ENABLE_BT = 1;
 
 	/**
+	 * Minimum value samples (points) in Y axis.
+	 */
+	private static final float CHART_Y_MIN_VAL = 0;
+
+	/**
+	 * Maximum value samples (points) in Y axis.
+	 */
+	private static final float CHART_Y_MAX_VAL = 127;
+
+	/**
 	 * Receive BT data from mcu device.
 	 */
 	private static final int RECEIVE_BT_DATA = 1;
@@ -311,8 +321,8 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 		lineChart.setData(new LineData());
 		lineChart.invalidate();
 		lineChart.setBackgroundColor(Color.GRAY);
-		lineChart.getAxisLeft().setAxisMaxValue(255f);
-		lineChart.getAxisLeft().setAxisMinValue(0);
+		lineChart.getAxisLeft().setAxisMinValue(CHART_Y_MIN_VAL);
+		lineChart.getAxisLeft().setAxisMaxValue(CHART_Y_MAX_VAL);
 	}
 
 	/**
@@ -438,7 +448,6 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 	 * @param val value from selected channel.
 	 */
 	private void addEntry(int channel, float val) {
-		log("channel = " + channel + " | " + "val = " + val);
 		LineData data = lineChart.getData();
 
 		if(data != null) {
