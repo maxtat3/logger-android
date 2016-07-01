@@ -17,12 +17,24 @@
 #include "usart.h"
 #include "debug.h"
 
+// Delay between translated data
+#define	TX_BYTE_DELAY		_delay_ms(60)
+
 // If this flag true - command for start measure process and sending data to USART
 // otherwise - command for start measure process.
 bool isTranslateData = false;
 
+/*
+* Converted value and status (number of channel) to two Bytes.
+* val - adc value, 10 bit max [0 ... 1023]
+* st - status, command, 4 bit max [0 ... 15]
+*/
+void cmdAndDataConv(unsigned int val, unsigned int st, unsigned char *high, unsigned char *low);
+
 
 int main(void){
+	unsigned char low; // low Byte
+	unsigned char high; // high Byte
 	unsigned char sym;
 	
 	cli();
@@ -40,30 +52,37 @@ int main(void){
 			isTranslateData = !isTranslateData;
 		} 
 
-		_delay_ms(100); 
-
 		if (isTranslateData){
-			if (sym == '0'){
-				sendCharToUSART((unsigned char)(get_adc_val_0()/4));
-			} else if(sym == '1'){
-				sendCharToUSART((unsigned char)(get_adc_val_1()/4));
-			} else if(sym == '2'){
-				sendCharToUSART((unsigned char)(get_adc_val_2()/4));
-			} else if(sym == '3'){
-				sendCharToUSART((unsigned char)(get_adc_val_3()/4));
-			}
-		}
+			cmdAndDataConv(get_adc_val_0()/4, 0, &high, &low);
+			sendCharToUSART(low);
+			TX_BYTE_DELAY;
+			sendCharToUSART(high);
+			TX_BYTE_DELAY;
 
-		// debug data set 
-		// if (sym == '0'){
-		// 	sendCharToUSART((unsigned char)30);
-		// } else if(sym == '1'){
-		// 	sendCharToUSART((unsigned char)50);
-		// } else if(sym == '2'){
-		// 	sendCharToUSART((unsigned char)70);
-		// } else if(sym == '3'){
-		// 	sendCharToUSART((unsigned char)110);
-		// }
+			cmdAndDataConv(get_adc_val_1()/4, 1, &high, &low);
+			sendCharToUSART(low);
+			TX_BYTE_DELAY;
+			sendCharToUSART(high);
+			TX_BYTE_DELAY;
+
+			cmdAndDataConv(get_adc_val_2()/4, 2, &high, &low);
+			sendCharToUSART(low);
+			TX_BYTE_DELAY;
+			sendCharToUSART(high);
+			TX_BYTE_DELAY;
+
+			cmdAndDataConv(get_adc_val_3()/4, 3, &high, &low);
+			sendCharToUSART(low);
+			TX_BYTE_DELAY;
+			sendCharToUSART(high);
+			TX_BYTE_DELAY;
+		}
 	}
+}
+
+void cmdAndDataConv(unsigned int val, unsigned int st, unsigned char *high, unsigned char *low){
+	*low = val & 0x7F;
+    *high = (val >> 7) & 0x7;
+    *high = ((st << 3) & 0x78) | *high;
 }
 

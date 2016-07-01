@@ -155,12 +155,6 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 	private boolean isRecord = false;
 
 	/**
-	 * Channel counter. Pointed to current handled channel.
-	 * For 4 total channels this counter accept values are [0, 1, 2, 3].
-	 */
-	private Integer channel = 0;
-
-	/**
 	 * Buffer for values of all channels {@link #MAX_CHANNELS} in full iteration.
 	 */
 	private float[] valuesOfChannelsBuf = new float[4];
@@ -395,13 +389,6 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 
 		if (connectedThread != null) {
 			connectedThread.write(START_STOP_CMD);
-			// this delay may be higher main channels delay in main.c
-			try {
-				Thread.sleep(30);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			connectedThread.write(channel.toString());
 		}
 		startTime = System.currentTimeMillis();
 	}
@@ -601,7 +588,12 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 	 * Handler for update chart in UI thread.
 	 */
 	private static class ChartHandler extends Handler {
-		WeakReference<MainActivity> wActivity;
+		private int byteCounter = 0; //0 - low Byte, 1 - high Byte; By default pointed to low Byte
+		private int rxLow; // low Byte, using 7 bit only
+		private int rxHigh; // high Byte, using 7 bit only
+		private int adcVal; // ADC value
+		private int channel; // channel number (0 ... 3)
+		private WeakReference<MainActivity> wActivity;
 
 		public ChartHandler(MainActivity activity) {
 			wActivity = new WeakReference<MainActivity>(activity);
@@ -610,29 +602,43 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 		@Override
 		public void handleMessage(Message msg) {
 			if (msg.what == RECEIVE_BT_DATA) {
-				wActivity.get().addEntry(wActivity.get().channel, msg.arg1);
-				if (wActivity.get().isRecord) {
+				if (byteCounter == 0) {
+					rxLow = msg.arg1;
+					byteCounter++;
 
-					switch (wActivity.get().channel) {
-						case 0:
-							wActivity.get().results.getValues0().add(msg.arg1);
-							break;
-						case 1:
-							wActivity.get().results.getValues1().add(msg.arg1);
-							break;
-						case 2:
-							wActivity.get().results.getValues2().add(msg.arg1);
-							break;
-						case 3:
-							wActivity.get().results.getValues3().add(msg.arg1);
-							break;
+				}else if (byteCounter == 1) {
+					rxHigh = msg.arg1;
+					// all Bytes (7 bits in every Byte) received and do decoding it
+					// High Byte [14 - 11] bits - number of ADC channel, [10 - 8] bits - 10 bits ADC value part
+					// low Byte [7 - 0] bits - 10 bits ADC value part
+					adcVal = (rxLow & 0x7F) | ((rxHigh & 0x7) << 7);
+					channel = (rxHigh & 0x78) >> 3;
+
+					byteCounter = 0;
+
+//					Log.d(LOG, "val = " + adcVal);
+//					Log.d(LOG, "cmd = " + channel);
+//					if (channel == 3) Log.d(LOG, "----");
+					wActivity.get().addEntry(channel, adcVal);
+
+					// record values to file
+					if (wActivity.get().isRecord) {
+						switch (channel) {
+							case 0:
+								wActivity.get().results.getValues0().add(adcVal);
+								break;
+							case 1:
+								wActivity.get().results.getValues1().add(adcVal);
+								break;
+							case 2:
+								wActivity.get().results.getValues2().add(adcVal);
+								break;
+							case 3:
+								wActivity.get().results.getValues3().add(adcVal);
+								break;
+						}
 					}
-
 				}
-
-				wActivity.get().channel++;
-				if (wActivity.get().channel == MAX_CHANNELS) wActivity.get().channel = 0;
-				wActivity.get().connectedThread.write(wActivity.get().channel.toString());
 			}
 		}
 	}
