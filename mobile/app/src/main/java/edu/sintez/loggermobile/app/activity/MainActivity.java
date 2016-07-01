@@ -52,6 +52,12 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 	private static final int REQUEST_ENABLE_BT = 1;
 
 	/**
+	 * Maximum viewed points (samples) placed for X axis in one display.
+	 * After this maximum points, chart dynamic shifted to left.
+	 */
+	private static final int CHART_X_MAX_POINTS = 100;
+
+	/**
 	 * Minimum value samples (points) in Y axis.
 	 */
 	private static final float CHART_Y_MIN_VAL = 0;
@@ -470,6 +476,8 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 				data.addXValue(getRealTime());
 			}
 
+			lineChart.setVisibleXRangeMaximum(CHART_X_MAX_POINTS);
+			lineChart.setVisibleYRangeMaximum(CHART_Y_MAX_VAL, YAxis.AxisDependency.LEFT);
 			lineChart.notifyDataSetChanged();
 			// this automatically refreshes the chart (calls invalidate())
 			lineChart.moveViewTo(data.getXValCount()-7, 50f, YAxis.AxisDependency.LEFT);
@@ -529,8 +537,6 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 		set.setHighLightColor(Color.rgb(190, 190, 190));
 		set.setAxisDependency(YAxis.AxisDependency.LEFT);
 		set.setValueTextSize(10f);
-		lineChart.setVisibleXRangeMaximum(300);
-		lineChart.setVisibleYRangeMaximum(CHART_Y_MAX_VAL, YAxis.AxisDependency.LEFT);
 		return set;
 	}
 
