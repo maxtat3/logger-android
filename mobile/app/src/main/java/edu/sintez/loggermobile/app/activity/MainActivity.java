@@ -58,8 +58,9 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 
 	/**
 	 * Maximum value samples (points) in Y axis.
+	 * This set for 10 bit ADC.
 	 */
-	private static final float CHART_Y_MAX_VAL = 127;
+	private static final float CHART_Y_MAX_VAL = 1050;
 
 	/**
 	 * Receive BT data from mcu device.
@@ -470,9 +471,6 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 			}
 
 			lineChart.notifyDataSetChanged();
-
-			lineChart.setVisibleXRangeMaximum(300);
-			lineChart.setVisibleYRangeMaximum(200, YAxis.AxisDependency.LEFT);
 			// this automatically refreshes the chart (calls invalidate())
 			lineChart.moveViewTo(data.getXValCount()-7, 50f, YAxis.AxisDependency.LEFT);
 		}
@@ -531,6 +529,8 @@ public class MainActivity extends Activity implements OnChartValueSelectedListen
 		set.setHighLightColor(Color.rgb(190, 190, 190));
 		set.setAxisDependency(YAxis.AxisDependency.LEFT);
 		set.setValueTextSize(10f);
+		lineChart.setVisibleXRangeMaximum(300);
+		lineChart.setVisibleYRangeMaximum(CHART_Y_MAX_VAL, YAxis.AxisDependency.LEFT);
 		return set;
 	}
 

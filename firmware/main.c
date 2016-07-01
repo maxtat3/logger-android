@@ -53,25 +53,25 @@ int main(void){
 		} 
 
 		if (isTranslateData){
-			cmdAndDataConv(get_adc_val_0()/4, 0, &high, &low);
+			cmdAndDataConv(get_adc_val_0(), 0, &high, &low);
 			sendCharToUSART(low);
 			TX_BYTE_DELAY;
 			sendCharToUSART(high);
 			TX_BYTE_DELAY;
 
-			cmdAndDataConv(get_adc_val_1()/4, 1, &high, &low);
+			cmdAndDataConv(get_adc_val_1(), 1, &high, &low);
 			sendCharToUSART(low);
 			TX_BYTE_DELAY;
 			sendCharToUSART(high);
 			TX_BYTE_DELAY;
 
-			cmdAndDataConv(get_adc_val_2()/4, 2, &high, &low);
+			cmdAndDataConv(get_adc_val_2(), 2, &high, &low);
 			sendCharToUSART(low);
 			TX_BYTE_DELAY;
 			sendCharToUSART(high);
 			TX_BYTE_DELAY;
 
-			cmdAndDataConv(get_adc_val_3()/4, 3, &high, &low);
+			cmdAndDataConv(get_adc_val_3(), 3, &high, &low);
 			sendCharToUSART(low);
 			TX_BYTE_DELAY;
 			sendCharToUSART(high);
