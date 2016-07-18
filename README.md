@@ -38,16 +38,23 @@ Software part:
 1. To begin we must assemble electronic part. See *./logger-android/circuit* directory. 
 2. Connect atmel comparable programmer to PC (COM, USB, LPT) and MCU (ISP). May be neccessary set permissions for work with it in linux systems.
 3. Write firmware to MCU. Now we compile of sources. Go to *./logger-android/firmware* catalog. 
-> **Note:** Must be installed **avr gcc** packages for compile avr projects. For Windows platforms see WinAVR project. For linux you can install from terminal next packages: *sudo apt-get install avrdude gcc-avr binutils-avr gdb-avr avr-libc*
+> **Note:** Must be installed **avr gcc** packages for compile avr projects. For Windows platforms see WinAVR project. For linux you can install from terminal next packages:    
+```sudo apt-get install avrdude gcc-avr binutils-avr gdb-avr avr-libc```    
   > **Note:** When crystal frequency selected different of in this project, open MakeFile , find F_CPU constant and select for your case. In additions necessary recalculate constants for USART module. As example constants collected [see in Atmega8 documentation](http://www.atmel.com/images/atmel-2486-8-bit-avr-microcontroller-atmega8_l_datasheet.pdf) in tables 60 - 63 in page 153 . Open usart.h file and changed USART_UBRR_HIGH_PART and USART_UBRR_LOW_PART constants for new MCU frequency rate.
 
-  Execute next command for compile and burn firmware: *make clean && make build && sudo make program* in linux systems and similar command placed in WinAVR Studio for Windows. 
-4. Writting fuse bits. To see alredy burned fusebits in MCU execute command *sudo avrdude -P pPort -c pName -p mcuName -v*    Where:   
+  Execute next command for compile and burn firmware in linux systems:     
+  ```make clean && make build && sudo make program```    
+  and similar command placed in WinAVR Studio for Windows. 
+4. Writting fuse bits. To see alredy burned fusebits in MCU execute command    
+```sudo avrdude -P pPort -c pName -p mcuName -v```    
+Where:   
   pPort - programmer port. For example: /dev/ttyACM0, usb   
   pName - programmer name. For example: avr910, usbasp   
   mcuName - MCU name. For example: ATmega8, attiny2313   
 
-  Now we can burning fusebits for this project. High Byte = D9, Low Byte = EF. Execute next command: *avrdude -c porgrammerName -p mcuName -U lfuse:w:0xEF:m -U hfuse:w:0xD9:m*
+  Now we can burning fusebits for this project. High Byte = D9, Low Byte = EF.    
+  Execute next command:  
+  ```avrdude -c porgrammerName -p mcuName -U lfuse:w:0xEF:m -U hfuse:w:0xD9:m```     
 5. Next step set settings in HC-05 bluetooth module. With help it AT commands configure HC-05 module. You need download proprietary software. Now should set parametrs: 38400 baude rate, id (enterred later in android application),password, other settings. For more see documentation in this bluetooth module.
 6. Enable assembled electronic device when it is turn off.
 7. Connect android device to PC via usb. Only for install logger application.
